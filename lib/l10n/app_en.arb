@@ -14,5 +14,81 @@
   "switchLanguage": "العربية",
   "@switchLanguage": {
     "description": "Label of the language toggle button. Deliberately shows the TARGET language's name in its own script, so the value differs per locale (EN shows Arabic, AR shows English)"
+  },
+
+  "signIn": "Sign in",
+  "@signIn": {
+    "description": "Title and submit button of the login page"
+  },
+
+  "signUp": "Sign up",
+  "@signUp": {
+    "description": "Title and submit button of the sign-up page"
+  },
+
+  "signOut": "Sign out",
+  "@signOut": {
+    "description": "Button that signs the current user out"
+  },
+
+  "email": "Email",
+  "@email": {
+    "description": "Label of the email input field"
+  },
+
+  "password": "Password",
+  "@password": {
+    "description": "Label of the password input field"
+  },
+
+  "fullName": "Full name",
+  "@fullName": {
+    "description": "Label of the display-name input field on sign-up"
+  },
+
+  "enterValidEmail": "Enter a valid email address",
+  "@enterValidEmail": {
+    "description": "Validation message for an empty or malformed email"
+  },
+
+  "enterYourName": "Enter your name",
+  "@enterYourName": {
+    "description": "Validation message for an empty display-name field"
+  },
+
+  "passwordTooShort": "Password must be at least 8 characters",
+  "@passwordTooShort": {
+    "description": "Validation message for a password below the minimum length"
+  },
+
+  "signedInAs": "Signed in as {email}",
+  "@signedInAs": {
+    "description": "Shows which account is authenticated",
+    "placeholders": {
+      "email": {
+        "type": "String",
+        "example": "you@example.com"
+      }
+    }
+  },
+
+  "noAccountPrompt": "Don't have an account? Sign up",
+  "@noAccountPrompt": {
+    "description": "Link on the login page to the sign-up page"
+  },
+
+  "haveAccountPrompt": "Already have an account? Sign in",
+  "@haveAccountPrompt": {
+    "description": "Link on the sign-up page to the login page"
+  },
+
+  "openAuthDemo": "Open auth demo",
+  "@openAuthDemo": {
+    "description": "Gallery button that opens the auth screens"
+  },
+
+  "authUnavailable": "Firebase is not configured yet — sign-in is unavailable.",
+  "@authUnavailable": {
+    "description": "Shown in the gallery when Firebase platform config is absent"
   }
 }

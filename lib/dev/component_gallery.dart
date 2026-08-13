@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../core/error/app_error.dart';
+import '../data/firebase/firebase_bootstrap.dart';
 import '../di/locator.dart';
+import '../features/auth/presentation/login_page.dart';
 import '../l10n/app_localizations.dart';
 import '../shared/components/app_button.dart';
 import '../shared/components/app_error_view.dart';
@@ -62,6 +64,8 @@ class _ComponentGalleryState extends State<ComponentGallery> {
             _LoadingCard(),
             _SectionTitle('AppTextField'),
             _TextFieldCard(),
+            _SectionTitle('Auth'),
+            _AuthCard(),
             SizedBox(height: 24),
           ],
         ),
@@ -273,6 +277,36 @@ class _TextFieldCardState extends State<_TextFieldCard> {
             hint: 'Search by name or specialty',
             onSubmitted: (_) {},
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuthCard extends StatelessWidget {
+  const _AuthCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return _Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (FirebaseBootstrap.isReady)
+            AppButton(
+              label: l10n.openAuthDemo,
+              icon: Icons.login,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const LoginPage()),
+              ),
+            )
+          else
+            Text(
+              l10n.authUnavailable,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
         ],
       ),
     );

@@ -5,5 +5,33 @@
 
   "retry": "إعادة المحاولة",
 
-  "switchLanguage": "English"
+  "switchLanguage": "English",
+
+  "signIn": "تسجيل الدخول",
+
+  "signUp": "إنشاء حساب",
+
+  "signOut": "تسجيل الخروج",
+
+  "email": "البريد الإلكتروني",
+
+  "password": "كلمة المرور",
+
+  "fullName": "الاسم الكامل",
+
+  "enterValidEmail": "أدخل عنوان بريد إلكتروني صحيح",
+
+  "enterYourName": "أدخل اسمك",
+
+  "passwordTooShort": "كلمة المرور يجب ألا تقل عن ٨ أحرف",
+
+  "signedInAs": "تم تسجيل الدخول باسم {email}",
+
+  "noAccountPrompt": "ليس لديك حساب؟ أنشئ حسابًا",
+
+  "haveAccountPrompt": "لديك حساب بالفعل؟ سجّل الدخول",
+
+  "openAuthDemo": "فتح تجربة تسجيل الدخول",
+
+  "authUnavailable": "لم يتم إعداد Firebase بعد — تسجيل الدخول غير متاح."
 }

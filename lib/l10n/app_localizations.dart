@@ -115,6 +115,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'العربية'**
   String get switchLanguage;
+
+  /// Title and submit button of the login page
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signIn;
+
+  /// Title and submit button of the sign-up page
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up'**
+  String get signUp;
+
+  /// Button that signs the current user out
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get signOut;
+
+  /// Label of the email input field
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// Label of the password input field
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// Label of the display-name input field on sign-up
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get fullName;
+
+  /// Validation message for an empty or malformed email
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address'**
+  String get enterValidEmail;
+
+  /// Validation message for an empty display-name field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name'**
+  String get enterYourName;
+
+  /// Validation message for a password below the minimum length
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get passwordTooShort;
+
+  /// Shows which account is authenticated
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in as {email}'**
+  String signedInAs(String email);
+
+  /// Link on the login page to the sign-up page
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? Sign up'**
+  String get noAccountPrompt;
+
+  /// Link on the sign-up page to the login page
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? Sign in'**
+  String get haveAccountPrompt;
+
+  /// Gallery button that opens the auth screens
+  ///
+  /// In en, this message translates to:
+  /// **'Open auth demo'**
+  String get openAuthDemo;
+
+  /// Shown in the gallery when Firebase platform config is absent
+  ///
+  /// In en, this message translates to:
+  /// **'Firebase is not configured yet — sign-in is unavailable.'**
+  String get authUnavailable;
 }
 
 class _AppLocalizationsDelegate
