@@ -66,6 +66,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  # Generate type-safe AppLocalizations classes from lib/l10n/*.arb on
+  # `flutter pub get` / `flutter gen-l10n`. See l10n.yaml for the wiring.
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

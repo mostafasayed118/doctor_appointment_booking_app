@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Doctor Appointment Booking",
+  "@appTitle": {
+    "description": "App name shown in the app bar and window title"
+  },
+
+  "retry": "Retry",
+  "@retry": {
+    "description": "Label of the retry button shown in error views"
+  },
+
+  "switchLanguage": "العربية",
+  "@switchLanguage": {
+    "description": "Label of the language toggle button. Deliberately shows the TARGET language's name in its own script, so the value differs per locale (EN shows Arabic, AR shows English)"
+  }
+}

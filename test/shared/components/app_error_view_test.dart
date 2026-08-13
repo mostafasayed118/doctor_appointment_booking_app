@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:doctor_appointment_booking_app/core/error/app_error.dart';
+import 'package:doctor_appointment_booking_app/l10n/app_localizations.dart';
 import 'package:doctor_appointment_booking_app/shared/components/app_error_view.dart';
 
 void main() {
-  Widget wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+  // The retry label comes from AppLocalizations, so the test wrapper needs
+  // the localization delegates (defaults to English).
+  Widget wrap(Widget child) => MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(body: child),
+      );
 
   const error = NetworkError(message: 'No connection.');
 

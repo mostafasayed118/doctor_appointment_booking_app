@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
 
+import '../shared/services/locale_service.dart';
+
 /// Global service locator.
 ///
 /// Registered once in [setupLocator] (called from `main` before `runApp`)
@@ -27,6 +29,7 @@ void setupLocator() {
   sl.registerLazySingleton<PlaceholderService>(
     () => const PlaceholderService(),
   );
+  sl.registerLazySingleton<LocaleService>(() => LocaleService());
 }
 
 /// Tears down the container. Used by tests so registrations don't leak

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/error/app_error.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Full-area error state shown by every screen's Error state.
 ///
@@ -46,7 +47,7 @@ class AppErrorView extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: Text(AppLocalizations.of(context).retry),
               ),
             ],
           ],

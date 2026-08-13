@@ -1,0 +1,14 @@
+# Flutter gen-l10n configuration.
+#
+# Catalogs live in lib/l10n/ with app_en.arb as the template (source of
+# truth for keys and metadata). Generated classes are emitted into the same
+# directory (Flutter's default since the synthetic-package flag was removed)
+# so they can be read and reviewed — import them as
+# `package:doctor_appointment_booking_app/l10n/app_localizations.dart`.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+# AppLocalizations.of(context) returns the non-nullable instance, so call
+# sites don't need `!` (Flutter's default since 3.22 — set explicitly so the
+# behavior is pinned regardless of SDK version).
+nullable-getter: false
