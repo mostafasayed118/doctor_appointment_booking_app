@@ -148,8 +148,14 @@ async function run() {
 
   // 1. Upload photos first so the doctors get stable download URLs. Real
   //    photos in data/images/<id>.png win over generated avatars.
-  const uploads = await Promise.all(
-    doctors.map(async (doctor) => {
+  //    If the storage bucket doesn't exist yet (project without billing /
+  //    Storage not provisioned), degrade to an empty photoUrl — the app
+  //    falls back to initials avatars — and warn so a later re-run after
+  //    provisioning upgrades the photos (idempotent set()).
+  const uploads = [];
+  let photosUploaded = 0;
+  for (const doctor of doctors) {
+    try {
       const photo = readOverridePhoto(doctor.id) ?? generateDoctorPhoto(doctor.id);
       const objectPath = `doctor-photos/${doctor.id}.png`;
       await bucket.file(objectPath).save(photo, {
@@ -159,10 +165,23 @@ async function run() {
       const url =
         `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/` +
         `${encodeURIComponent(objectPath)}?alt=media`;
-      return { doctor, url };
-    }),
-  );
-  console.log(`  ✓ uploaded ${uploads.length} doctor photos`);
+      uploads.push({ doctor, url });
+      photosUploaded++;
+    } catch (error) {
+      const msg = String(error && error.message ? error.message : error);
+      if (msg.includes('bucket does not exist')) {
+        console.warn(
+          `  ⚠ storage bucket ${STORAGE_BUCKET} not available; ` +
+            `${doctor.id} photoUrl left empty (app shows initials). ` +
+            `Provision Storage (console → Storage → Get started), then re-run.`,
+        );
+        uploads.push({ doctor, url: '' });
+      } else {
+        throw error;
+      }
+    }
+  }
+  console.log(`  ✓ uploaded ${photosUploaded}/${uploads.length} doctor photos`);
 
   // 2. Doctors — one document per stable id (set = overwrite in place).
   await Promise.all(
@@ -194,7 +213,7 @@ async function run() {
   }
   console.log(`  ✓ wrote ${allSlots.length} slots`);
 
-  console.log(`Done. Doctors: ${doctors.length} · Slots: ${allSlots.length} · Images: ${uploads.length}`);
+  console.log(`Done. Doctors: ${doctors.length} · Slots: ${allSlots.length} · Images: ${photosUploaded}/${uploads.length}`);
   console.log(
     'Note: re-seeding resets every slot to isBooked=false, wiping any test bookings.',
   );
