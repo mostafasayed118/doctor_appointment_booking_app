@@ -187,18 +187,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Already have an account? Sign in'**
   String get haveAccountPrompt;
-
-  /// Gallery button that opens the auth screens
-  ///
-  /// In en, this message translates to:
-  /// **'Open auth demo'**
-  String get openAuthDemo;
-
-  /// Shown in the gallery when Firebase platform config is absent
-  ///
-  /// In en, this message translates to:
-  /// **'Firebase is not configured yet — sign-in is unavailable.'**
-  String get authUnavailable;
 }
 
 class _AppLocalizationsDelegate

@@ -80,15 +80,5 @@
   "haveAccountPrompt": "Already have an account? Sign in",
   "@haveAccountPrompt": {
     "description": "Link on the sign-up page to the login page"
-  },
-
-  "openAuthDemo": "Open auth demo",
-  "@openAuthDemo": {
-    "description": "Gallery button that opens the auth screens"
-  },
-
-  "authUnavailable": "Firebase is not configured yet — sign-in is unavailable.",
-  "@authUnavailable": {
-    "description": "Shown in the gallery when Firebase platform config is absent"
   }
 }

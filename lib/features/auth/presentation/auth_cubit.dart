@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // core.* is the AppError family (incl. the AuthError AppError subtype);
@@ -21,7 +22,12 @@ import 'auth_state.dart';
 /// 2. One-shot actions (signIn/signUp/signOut) — emit [AuthLoading], then a
 ///    terminal state. Sign-out success itself is only confirmed through the
 ///    stream (Firebase emits null), so [AuthCubit] waits for that event.
-class AuthCubit extends Cubit<AuthState> {
+///
+/// Implements [Listenable] via [ChangeNotifier]: bloc 9 dropped the
+/// `Listenable` implementation from `BlocBase`, and GoRouter's
+/// `refreshListenable` needs it so every state change re-runs the auth
+/// guard redirect.
+class AuthCubit extends Cubit<AuthState> with ChangeNotifier {
   AuthCubit({
     required this._signIn,
     required this._signUp,
@@ -32,6 +38,11 @@ class AuthCubit extends Cubit<AuthState> {
           _onAuthStateChanged,
           onError: _onAuthStateError,
         );
+    // GoRouter refreshListenable: re-run the auth guard on every state
+    // change. Listens to our OWN state stream (not `onChange`) because
+    // bloc 9 fires `onChange` BEFORE `_state` is updated — notifying there
+    // would make the redirect read the stale previous state.
+    _stateSubscription = stream.listen((_) => notifyListeners());
   }
 
   final SignIn _signIn;
@@ -39,8 +50,22 @@ class AuthCubit extends Cubit<AuthState> {
   final SignOut _signOut;
   final AuthRepository _repository;
   late final StreamSubscription<AuthUser?> _authSubscription;
+  late final StreamSubscription<AuthState> _stateSubscription;
+
+  /// Last user reported by the auth state stream — what [reset] returns to
+  /// when clearing an error, so it reflects reality (not hardcoded state).
+  AuthUser? _currentUser;
 
   void _onAuthStateChanged(AuthUser? user) {
+    _currentUser = user;
+    emit(user == null ? const Unauthenticated() : Authenticated(user));
+  }
+
+  /// Dismisses an error state and returns to the last known auth reality
+  /// ([Authenticated] or [Unauthenticated]). Lets a failed sign-in recover
+  /// back to the form without reloading the app.
+  void reset() {
+    final user = _currentUser;
     emit(user == null ? const Unauthenticated() : Authenticated(user));
   }
 
@@ -90,6 +115,8 @@ class AuthCubit extends Cubit<AuthState> {
   @override
   Future<void> close() async {
     await _authSubscription.cancel();
+    await _stateSubscription.cancel();
     await super.close();
+    dispose();
   }
 }

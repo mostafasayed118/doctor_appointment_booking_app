@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../core/error/app_error.dart';
-import '../data/firebase/firebase_bootstrap.dart';
-import '../di/locator.dart';
-import '../features/auth/presentation/login_page.dart';
+import '../features/auth/presentation/auth_cubit.dart';
+import '../features/auth/presentation/auth_state.dart';
 import '../l10n/app_localizations.dart';
 import '../shared/components/app_button.dart';
 import '../shared/components/app_error_view.dart';
 import '../shared/components/app_text_field.dart';
 import '../shared/components/empty_state.dart';
+import '../shared/components/language_toggle_button.dart';
 import '../shared/components/loading_view.dart';
-import '../shared/services/locale_service.dart';
 import '../shared/theme/app_theme.dart';
 
 /// Dev screen: renders every shared component in one place so the theme
-/// and components can be eyeballed (light + dark) — currently the app's
-/// home until routing lands in Task 8.
+/// and components can be eyeballed (light + dark). Serves as the app's
+/// /home route until real feature screens land in Tasks 9+.
 ///
 /// Deliberately does NOT wrap itself in its own MaterialApp: it must run
 /// inside the app shell so it inherits the shell's localization and
@@ -39,13 +39,25 @@ class _ComponentGalleryState extends State<ComponentGallery> {
         appBar: AppBar(
           title: const Text('Shared components'),
           actions: [
-            TextButton(
-              onPressed: sl<LocaleService>().toggle,
-              child: Text(AppLocalizations.of(context).switchLanguage),
-            ),
+            const LanguageToggleButton(),
             TextButton(
               onPressed: () => setState(() => _dark = !_dark),
               child: Text(_dark ? 'Light' : 'Dark'),
+            ),
+            BlocBuilder<AuthCubit, AuthState>(
+              builder: (context, state) {
+                if (state is! Authenticated) {
+                  return const SizedBox.shrink();
+                }
+                // Dev convenience until Tasks 9+ give signed-in users real
+                // screens: the AppBar shows who's signed in and how to
+                // leave. The cubit comes from the router above this route.
+                return TextButton.icon(
+                  onPressed: context.read<AuthCubit>().signOut,
+                  icon: const Icon(Icons.logout),
+                  label: Text(AppLocalizations.of(context).signOut),
+                );
+              },
             ),
           ],
         ),
@@ -64,8 +76,6 @@ class _ComponentGalleryState extends State<ComponentGallery> {
             _LoadingCard(),
             _SectionTitle('AppTextField'),
             _TextFieldCard(),
-            _SectionTitle('Auth'),
-            _AuthCard(),
             SizedBox(height: 24),
           ],
         ),
@@ -277,36 +287,6 @@ class _TextFieldCardState extends State<_TextFieldCard> {
             hint: 'Search by name or specialty',
             onSubmitted: (_) {},
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AuthCard extends StatelessWidget {
-  const _AuthCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return _Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (FirebaseBootstrap.isReady)
-            AppButton(
-              label: l10n.openAuthDemo,
-              icon: Icons.login,
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const LoginPage()),
-              ),
-            )
-          else
-            Text(
-              l10n.authUnavailable,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
         ],
       ),
     );

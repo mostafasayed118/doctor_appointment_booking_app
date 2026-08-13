@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../di/locator.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/components/app_button.dart';
 import '../../../shared/components/app_error_view.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../../shared/components/app_text_field.dart';
+import '../../../shared/components/language_toggle_button.dart';
 import 'auth_cubit.dart';
 import 'auth_state.dart';
-import 'login_page.dart';
 import 'signed_in_view.dart';
 
 /// New-account screen (email + password + optional display name).
@@ -59,27 +60,32 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final cubit = sl<AuthCubit>();
-    return BlocProvider.value(
-      value: cubit,
-      child: Scaffold(
-        appBar: AppBar(title: Text(l10n.signUp)),
-        body: BlocBuilder<AuthCubit, AuthState>(
-          builder: (context, state) {
-            return switch (state) {
-              Authenticated(:final user) => SignedInView(
-                  user: user,
-                  onSignOut: cubit.signOut,
-                ),
-              AuthError(:final error) => AppErrorView(
-                  error: error,
-                  onRetry: () => _submit(cubit),
-                ),
-              AuthLoading() || AuthInitial() || Unauthenticated() =>
-                _buildForm(l10n, cubit, state is AuthLoading),
-            };
-          },
-        ),
+    // Provided above the route by the router (see buildAppRouter) — the
+    // page consumes it from context, never from the locator, so tests can
+    // inject a fake cubit.
+    final cubit = context.read<AuthCubit>();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.signUp),
+        actions: const [LanguageToggleButton()],
+      ),
+      body: BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, state) {
+          return switch (state) {
+            Authenticated(:final user) => SignedInView(
+                user: user,
+                onSignOut: cubit.signOut,
+              ),
+            AuthError(:final error) => AppErrorView(
+                error: error,
+                // Retry recovers to the form (fields keep their values)
+                // so the user can correct and resubmit — no reload needed.
+                onRetry: cubit.reset,
+              ),
+            AuthLoading() || AuthInitial() || Unauthenticated() =>
+              _buildForm(l10n, cubit, state is AuthLoading),
+          };
+        },
       ),
     );
   }
@@ -130,9 +136,7 @@ class _SignupPageState extends State<SignupPage> {
           ),
           const SizedBox(height: 12),
           TextButton(
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const LoginPage()),
-            ),
+            onPressed: () => context.go('/login'),
             child: Text(l10n.haveAccountPrompt),
           ),
         ],

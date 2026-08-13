@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 // Note: resolving AuthRepository is deliberately NOT tested here — its
 // construction touches FirebaseAuth.instance, which blocks on a platform
@@ -26,6 +27,9 @@ void main() {
     expect(sl.isRegistered<SignUp>(), isTrue);
     expect(sl.isRegistered<SignOut>(), isTrue);
     expect(sl.isRegistered<AuthCubit>(), isTrue);
+    // The router is registered lazily and built from the AuthCubit
+    // singleton (guard state source + refreshListenable).
+    expect(sl.isRegistered<GoRouter>(), isTrue);
   });
 
   test('resetting the locator clears all registrations', () async {

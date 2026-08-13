@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 
 import '../features/auth/data/auth_data_source.dart';
 import '../features/auth/data/auth_repository_impl.dart';
@@ -7,6 +8,7 @@ import '../features/auth/domain/use_cases/sign_in.dart';
 import '../features/auth/domain/use_cases/sign_out.dart';
 import '../features/auth/domain/use_cases/sign_up.dart';
 import '../features/auth/presentation/auth_cubit.dart';
+import '../shared/routing/router.dart';
 import '../shared/services/locale_service.dart';
 
 /// Global service locator.
@@ -43,6 +45,9 @@ void setupLocator() {
       repository: sl<AuthRepository>(),
     ),
   );
+  // Router depends on the AuthCubit singleton: the cubit is both the
+  // redirect's state source and GoRouter's refreshListenable.
+  sl.registerLazySingleton<GoRouter>(() => buildAppRouter(sl<AuthCubit>()));
 }
 
 /// Tears down the container. Used by tests so registrations don't leak

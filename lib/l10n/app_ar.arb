@@ -29,9 +29,5 @@
 
   "noAccountPrompt": "ليس لديك حساب؟ أنشئ حسابًا",
 
-  "haveAccountPrompt": "لديك حساب بالفعل؟ سجّل الدخول",
-
-  "openAuthDemo": "فتح تجربة تسجيل الدخول",
-
-  "authUnavailable": "لم يتم إعداد Firebase بعد — تسجيل الدخول غير متاح."
+  "haveAccountPrompt": "لديك حساب بالفعل؟ سجّل الدخول"
 }

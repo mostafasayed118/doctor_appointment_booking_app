@@ -54,11 +54,4 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get haveAccountPrompt => 'لديك حساب بالفعل؟ سجّل الدخول';
-
-  @override
-  String get openAuthDemo => 'فتح تجربة تسجيل الدخول';
-
-  @override
-  String get authUnavailable =>
-      'لم يتم إعداد Firebase بعد — تسجيل الدخول غير متاح.';
 }

@@ -54,11 +54,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get haveAccountPrompt => 'Already have an account? Sign in';
-
-  @override
-  String get openAuthDemo => 'Open auth demo';
-
-  @override
-  String get authUnavailable =>
-      'Firebase is not configured yet — sign-in is unavailable.';
 }

@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:doctor_appointment_booking_app/app.dart';
 import 'package:doctor_appointment_booking_app/di/locator.dart';
+
+import 'helpers/fake_auth_repository.dart';
+import 'helpers/test_app.dart';
 
 void main() {
   // The app shell resolves LocaleService via GetIt during build, so the
@@ -9,13 +11,15 @@ void main() {
   setUp(setupLocator);
   tearDown(resetLocator);
 
-  testWidgets('App builds and shows the dev home (component gallery)',
+  testWidgets('App builds; signed-out users are parked on /login by the guard',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const DoctorAppointmentApp());
+    final harness = buildTestApp(repository: FakeAuthRepository());
 
-    expect(find.text('Shared components'), findsOneWidget);
-    // First section is in the initial viewport; ListView builds lazily,
-    // so below-the-fold sections are not part of the tree yet.
-    expect(find.text('Theme'), findsOneWidget);
+    await tester.pumpWidget(harness.app);
+    await tester.pump(const Duration(milliseconds: 400));
+
+    // The auth guard owns entry now: no gallery, login form instead.
+    expect(find.text('Sign in'), findsWidgets);
+    expect(find.text('Shared components'), findsNothing);
   });
 }

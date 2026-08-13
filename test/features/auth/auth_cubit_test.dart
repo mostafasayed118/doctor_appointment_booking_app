@@ -131,6 +131,49 @@ void main() {
     );
   });
 
+  group('reset', () {
+    blocTest<AuthCubit, AuthState>(
+      'recovers to the sign-in form after a failed sign-in',
+      build: buildCubit,
+      setUp: () => when(
+        () => repository.signIn(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
+      ).thenAnswer((_) async => const Failure(core.AuthError())),
+      act: (cubit) async {
+        await cubit.signIn(email: 'ana@example.com', password: 'wrong');
+        cubit.reset();
+      },
+      expect: () => const [
+        AuthLoading(),
+        AuthError(core.AuthError()),
+        Unauthenticated(),
+      ],
+    );
+
+    blocTest<AuthCubit, AuthState>(
+      'recovers to Authenticated when a user is signed in',
+      build: buildCubit,
+      setUp: () => when(
+        () => repository.signOut(),
+      ).thenAnswer((_) async => const Failure(core.AuthError())),
+      act: (cubit) async {
+        authStateController.add(user);
+        // Let the stream deliver before the failing action runs.
+        await Future<void>.delayed(Duration.zero);
+        await cubit.signOut();
+        cubit.reset();
+      },
+      expect: () => const [
+        Authenticated(user),
+        AuthLoading(),
+        AuthError(core.AuthError()),
+        Authenticated(user),
+      ],
+    );
+  });
+
   group('signOut', () {
     blocTest<AuthCubit, AuthState>(
       'emits Unauthenticated via the stream after a successful sign-out',
