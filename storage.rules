@@ -1,0 +1,11 @@
+// DRAFT — Task 10. Finalized and deployed in Task 15 (firestore-rules).
+// Doctor photos are public catalog assets; nothing writes via the client.
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /doctor-photos/{imageId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

@@ -43,6 +43,15 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
+# Seed script secrets — the service account key is console-generated and
+# must NEVER be committed (the pre-commit safety check scans for it).
+tool/seed/service-account.json
+.env
+.env.*
+
+# Node (seed script dependencies)
+node_modules/
+
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
