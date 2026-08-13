@@ -24,21 +24,29 @@ void main() {
 
   /// The harness starts already authenticated (the guard would otherwise
   /// park the app on /login) so the localization assertions can reach the
-  /// gallery home where the theme + toggle live.
+  /// real landing — the doctors list, which is fully localized.
   DoctorAppointmentApp buildAuthenticatedApp() =>
       buildTestApp(repository: FakeAuthRepository(), initialUser: user).app;
+
+  // Bounded pumps, not pumpAndSettle: the doctors page's LoadingView
+  // spinner animates forever, so pumpAndSettle would time out.
+  Future<void> settle(WidgetTester tester) async {
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+  }
 
   group('DoctorAppointmentApp localization', () {
     testWidgets('renders English (LTR) by default', (tester) async {
       await tester.pumpWidget(buildAuthenticatedApp());
-      // Bounded pumps, not pumpAndSettle: the gallery's LoadingView
-      // spinners animate forever, so pumpAndSettle would time out.
-      await tester.pump(const Duration(milliseconds: 400));
+      await settle(tester);
 
-      expect(find.text('Shared components'), findsOneWidget);
+      // The signed-in landing is the doctors list (localized title + the
+      // empty-state copy for the harness's empty fake data).
+      expect(find.text('Doctors'), findsOneWidget);
+      expect(find.text('No doctors yet'), findsOneWidget);
 
       expect(
-        directionOf(tester, find.text('Shared components')),
+        directionOf(tester, find.text('No doctors yet')),
         TextDirection.ltr,
       );
     });
@@ -48,14 +56,14 @@ void main() {
       sl<LocaleService>().setLocale(const Locale('ar'));
 
       await tester.pumpWidget(buildAuthenticatedApp());
-      await tester.pump(const Duration(milliseconds: 400));
+      await settle(tester);
 
-      // The gallery's own strings are dev-only English, but the locale flows
-      // into the widget tree — visible via the toggle label (localized) and
-      // the flipped Directionality.
+      // The toggle advertises its target language, and the localized
+      // doctors copy flipped to Arabic + RTL.
       expect(find.text('English'), findsOneWidget);
+      expect(find.text('الأطباء'), findsOneWidget);
       expect(
-        directionOf(tester, find.text('Shared components')),
+        directionOf(tester, find.text('الأطباء')),
         TextDirection.rtl,
       );
     });
@@ -63,7 +71,7 @@ void main() {
     testWidgets('tapping the language toggle switches the UI live',
         (tester) async {
       await tester.pumpWidget(buildAuthenticatedApp());
-      await tester.pump(const Duration(milliseconds: 400));
+      await settle(tester);
 
       // In English the toggle advertises its target: "العربية".
       expect(find.text('العربية'), findsOneWidget);
@@ -75,7 +83,7 @@ void main() {
       // Toggle now advertises English, and the layout flipped to RTL.
       expect(find.text('English'), findsOneWidget);
       expect(
-        directionOf(tester, find.text('Shared components')),
+        directionOf(tester, find.text('الأطباء')),
         TextDirection.rtl,
       );
     });

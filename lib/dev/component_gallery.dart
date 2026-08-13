@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../core/error/app_error.dart';
 import '../features/auth/presentation/auth_cubit.dart';
@@ -14,8 +15,9 @@ import '../shared/components/loading_view.dart';
 import '../shared/theme/app_theme.dart';
 
 /// Dev screen: renders every shared component in one place so the theme
-/// and components can be eyeballed (light + dark). Serves as the app's
-/// /home route until real feature screens land in Tasks 9+.
+/// and components can be eyeballed (light + dark). Lives at /home as a dev
+/// tool — the app's real landing is /doctors, and this gallery is reached
+/// via the dev icon on the doctors page (or by typing /home).
 ///
 /// Deliberately does NOT wrap itself in its own MaterialApp: it must run
 /// inside the app shell so it inherits the shell's localization and
@@ -63,22 +65,49 @@ class _ComponentGalleryState extends State<ComponentGallery> {
         ),
         body: ListView(
           padding: const EdgeInsets.all(16),
-          children: const [
-            _SectionTitle('Theme'),
-            _ThemeCard(),
-            _SectionTitle('AppButton'),
-            _ButtonCard(),
-            _SectionTitle('AppErrorView'),
-            _ErrorCard(),
-            _SectionTitle('EmptyState'),
-            _EmptyCard(),
-            _SectionTitle('LoadingView'),
-            _LoadingCard(),
-            _SectionTitle('AppTextField'),
-            _TextFieldCard(),
-            SizedBox(height: 24),
+          children: [
+            // Dev entry to the first real feature (signed-in users only —
+            // the guard bounces signed-out visitors to /login).
+            const _SectionTitle('Doctors'),
+            const _DoctorsCard(),
+            const _SectionTitle('Theme'),
+            const _ThemeCard(),
+            const _SectionTitle('AppButton'),
+            const _ButtonCard(),
+            const _SectionTitle('AppErrorView'),
+            const _ErrorCard(),
+            const _SectionTitle('EmptyState'),
+            const _EmptyCard(),
+            const _SectionTitle('LoadingView'),
+            const _LoadingCard(),
+            const _SectionTitle('AppTextField'),
+            const _TextFieldCard(),
+            const SizedBox(height: 24),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _DoctorsCard extends StatelessWidget {
+  const _DoctorsCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return _Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppButton(
+            label: l10n.browseDoctors,
+            icon: Icons.medical_services_outlined,
+            // push keeps the gallery in the stack so devs can navigate
+            // back to the hub; real navigation lands in Tasks 11+.
+            onPressed: () => context.push('/doctors'),
+          ),
+        ],
       ),
     );
   }

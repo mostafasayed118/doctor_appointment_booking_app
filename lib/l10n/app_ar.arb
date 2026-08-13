@@ -29,5 +29,27 @@
 
   "noAccountPrompt": "ليس لديك حساب؟ أنشئ حسابًا",
 
-  "haveAccountPrompt": "لديك حساب بالفعل؟ سجّل الدخول"
+  "haveAccountPrompt": "لديك حساب بالفعل؟ سجّل الدخول",
+
+  "doctorsTitle": "الأطباء",
+
+  "searchDoctors": "ابحث بالاسم أو التخصص",
+
+  "allSpecialties": "الكل",
+
+  "noDoctors": "لا يوجد أطباء بعد",
+
+  "noDoctorsSubtitle": "سيظهر الأطباء هنا عندما يتوفرون.",
+
+  "noMatches": "لا يوجد أطباء مطابقون",
+
+  "noMatchesSubtitle": "جرّب بحثًا أو تخصصًا مختلفًا.",
+
+  "doctorProfile": "ملف الطبيب",
+
+  "profileBio": "نبذة",
+
+  "profileClinic": "العيادة",
+
+  "browseDoctors": "تصفح الأطباء"
 }

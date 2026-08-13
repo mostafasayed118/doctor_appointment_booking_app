@@ -54,4 +54,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get haveAccountPrompt => 'Already have an account? Sign in';
+
+  @override
+  String get doctorsTitle => 'Doctors';
+
+  @override
+  String get searchDoctors => 'Search by name or specialty';
+
+  @override
+  String get allSpecialties => 'All';
+
+  @override
+  String get noDoctors => 'No doctors yet';
+
+  @override
+  String get noDoctorsSubtitle =>
+      'Doctors will appear here once they\'re available.';
+
+  @override
+  String get noMatches => 'No doctors match';
+
+  @override
+  String get noMatchesSubtitle => 'Try a different search or specialty.';
+
+  @override
+  String get doctorProfile => 'Doctor profile';
+
+  @override
+  String get profileBio => 'About';
+
+  @override
+  String get profileClinic => 'Clinic';
+
+  @override
+  String get browseDoctors => 'Browse doctors';
 }

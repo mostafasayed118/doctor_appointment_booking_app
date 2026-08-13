@@ -71,5 +71,38 @@ void main() {
 
       expect(submitted, 'Cardiology');
     });
+
+    testWidgets('fires onChanged on every keystroke', (tester) async {
+      final controller = TextEditingController();
+      addTearDown(controller.dispose);
+
+      final changes = <String>[];
+      await tester.pumpWidget(
+        wrap(AppTextField(
+          controller: controller,
+          label: 'Search',
+          onChanged: changes.add,
+        )),
+      );
+
+      await tester.enterText(find.byType(TextField), 'car');
+
+      expect(changes, ['car']);
+    });
+
+    testWidgets('renders the prefix icon', (tester) async {
+      final controller = TextEditingController();
+      addTearDown(controller.dispose);
+
+      await tester.pumpWidget(
+        wrap(AppTextField(
+          controller: controller,
+          label: 'Search',
+          prefixIcon: Icons.search,
+        )),
+      );
+
+      expect(find.byIcon(Icons.search), findsOneWidget);
+    });
   });
 }

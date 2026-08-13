@@ -3,9 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../dev/component_gallery.dart';
+import '../../di/locator.dart';
 import '../../features/auth/presentation/auth_cubit.dart';
 import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/signup_page.dart';
+import '../../features/doctors/presentation/doctor_profile_cubit.dart';
+import '../../features/doctors/presentation/doctor_profile_page.dart';
+import '../../features/doctors/presentation/doctors_list_cubit.dart';
+import '../../features/doctors/presentation/doctors_list_page.dart';
 import '../../shared/components/empty_state.dart';
 import 'auth_guard.dart';
 
@@ -69,6 +74,25 @@ GoRouter buildAppRouter(
           value: authCubit,
           child: const ComponentGallery(),
         ),
+      ),
+      // Screen-scoped cubits: created fresh per navigation via the locator
+      // factory and closed by BlocProvider when the route is disposed.
+      GoRoute(
+        path: '/doctors',
+        builder: (context, state) => BlocProvider(
+          create: (_) => sl<DoctorsListCubit>()..load(),
+          child: const DoctorsListPage(),
+        ),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (context, state) => BlocProvider(
+              create: (_) => sl<DoctorProfileCubit>()
+                ..load(state.pathParameters['id']!),
+              child: const DoctorProfilePage(),
+            ),
+          ),
+        ],
       ),
     ],
     errorBuilder: (context, state) => const Scaffold(

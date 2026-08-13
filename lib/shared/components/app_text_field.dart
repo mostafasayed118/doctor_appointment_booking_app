@@ -15,8 +15,10 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.textInputAction,
+    this.onChanged,
     this.onSubmitted,
     this.autofillHints,
+    this.prefixIcon,
   });
 
   final TextEditingController controller;
@@ -26,8 +28,12 @@ class AppTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+
+  /// Live per-keystroke callback (e.g. search fields re-filter as you type).
+  final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final Iterable<String>? autofillHints;
+  final IconData? prefixIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +42,14 @@ class AppTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
+      onChanged: onChanged,
       onSubmitted: onSubmitted,
       autofillHints: autofillHints,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         errorText: errorText,
+        prefixIcon: prefixIcon == null ? null : Icon(prefixIcon),
       ),
     );
   }

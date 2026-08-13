@@ -54,4 +54,37 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get haveAccountPrompt => 'لديك حساب بالفعل؟ سجّل الدخول';
+
+  @override
+  String get doctorsTitle => 'الأطباء';
+
+  @override
+  String get searchDoctors => 'ابحث بالاسم أو التخصص';
+
+  @override
+  String get allSpecialties => 'الكل';
+
+  @override
+  String get noDoctors => 'لا يوجد أطباء بعد';
+
+  @override
+  String get noDoctorsSubtitle => 'سيظهر الأطباء هنا عندما يتوفرون.';
+
+  @override
+  String get noMatches => 'لا يوجد أطباء مطابقون';
+
+  @override
+  String get noMatchesSubtitle => 'جرّب بحثًا أو تخصصًا مختلفًا.';
+
+  @override
+  String get doctorProfile => 'ملف الطبيب';
+
+  @override
+  String get profileBio => 'نبذة';
+
+  @override
+  String get profileClinic => 'العيادة';
+
+  @override
+  String get browseDoctors => 'تصفح الأطباء';
 }

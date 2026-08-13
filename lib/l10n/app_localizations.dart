@@ -187,6 +187,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Already have an account? Sign in'**
   String get haveAccountPrompt;
+
+  /// App bar title of the doctors browse list
+  ///
+  /// In en, this message translates to:
+  /// **'Doctors'**
+  String get doctorsTitle;
+
+  /// Hint of the doctors search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name or specialty'**
+  String get searchDoctors;
+
+  /// Chip that clears the specialty filter
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allSpecialties;
+
+  /// Empty state when the doctors list is empty
+  ///
+  /// In en, this message translates to:
+  /// **'No doctors yet'**
+  String get noDoctors;
+
+  /// Empty state body when there are no doctors at all
+  ///
+  /// In en, this message translates to:
+  /// **'Doctors will appear here once they\'re available.'**
+  String get noDoctorsSubtitle;
+
+  /// Empty state when search/filter yields no results
+  ///
+  /// In en, this message translates to:
+  /// **'No doctors match'**
+  String get noMatches;
+
+  /// Empty state body when search/filter yields no results
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different search or specialty.'**
+  String get noMatchesSubtitle;
+
+  /// App bar title of the doctor profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Doctor profile'**
+  String get doctorProfile;
+
+  /// Section heading for the doctor's bio
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get profileBio;
+
+  /// Section heading for the clinic address
+  ///
+  /// In en, this message translates to:
+  /// **'Clinic'**
+  String get profileClinic;
+
+  /// Gallery entry button that opens the doctors list
+  ///
+  /// In en, this message translates to:
+  /// **'Browse doctors'**
+  String get browseDoctors;
 }
 
 class _AppLocalizationsDelegate

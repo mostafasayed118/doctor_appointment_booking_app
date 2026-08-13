@@ -8,6 +8,13 @@ import '../features/auth/domain/use_cases/sign_in.dart';
 import '../features/auth/domain/use_cases/sign_out.dart';
 import '../features/auth/domain/use_cases/sign_up.dart';
 import '../features/auth/presentation/auth_cubit.dart';
+import '../features/doctors/data/doctors_repository_impl.dart';
+import '../features/doctors/data/firestore_doctors_data_source.dart';
+import '../features/doctors/domain/doctors_repository.dart';
+import '../features/doctors/domain/use_cases/get_doctor.dart';
+import '../features/doctors/domain/use_cases/get_doctors.dart';
+import '../features/doctors/presentation/doctor_profile_cubit.dart';
+import '../features/doctors/presentation/doctors_list_cubit.dart';
 import '../shared/routing/router.dart';
 import '../shared/services/locale_service.dart';
 
@@ -45,6 +52,25 @@ void setupLocator() {
       repository: sl<AuthRepository>(),
     ),
   );
+  sl.registerLazySingleton<FirestoreDoctorsDataSource>(
+    () => FirestoreDoctorsDataSource(),
+  );
+  sl.registerLazySingleton<DoctorsRepository>(
+    () => DoctorsRepositoryImpl(dataSource: sl<FirestoreDoctorsDataSource>()),
+  );
+  sl.registerLazySingleton<GetDoctors>(() => GetDoctors(sl<DoctorsRepository>()));
+  sl.registerLazySingleton<GetDoctor>(() => GetDoctor(sl<DoctorsRepository>()));
+
+  // Screen-scoped Cubits: a fresh instance per navigation (the router's
+  // BlocProvider(create:) closes them on unmount), unlike the app-global
+  // AuthCubit singleton above.
+  sl.registerFactory<DoctorsListCubit>(
+    () => DoctorsListCubit(getDoctors: sl<GetDoctors>()),
+  );
+  sl.registerFactory<DoctorProfileCubit>(
+    () => DoctorProfileCubit(getDoctor: sl<GetDoctor>()),
+  );
+
   // Router depends on the AuthCubit singleton: the cubit is both the
   // redirect's state source and GoRouter's refreshListenable.
   sl.registerLazySingleton<GoRouter>(() => buildAppRouter(sl<AuthCubit>()));

@@ -38,7 +38,7 @@ void main() {
 
   group('signed in (Authenticated)', () {
     test('auth screens redirect away — to the pending deep link if set', () {
-      expect(authRedirect(Authenticated(user), '/login'), '/home');
+      expect(authRedirect(Authenticated(user), '/login'), '/doctors');
       expect(
         authRedirect(Authenticated(user), '/login', pendingLocation: '/doctors/abc'),
         '/doctors/abc',
@@ -49,8 +49,8 @@ void main() {
       );
     });
 
-    test('the root resolves to /home', () {
-      expect(authRedirect(Authenticated(user), '/'), '/home');
+    test('the root resolves to /doctors (the app landing)', () {
+      expect(authRedirect(Authenticated(user), '/'), '/doctors');
     });
 
     test('protected screens are allowed once signed in', () {

@@ -80,5 +80,60 @@
   "haveAccountPrompt": "Already have an account? Sign in",
   "@haveAccountPrompt": {
     "description": "Link on the sign-up page to the login page"
+  },
+
+  "doctorsTitle": "Doctors",
+  "@doctorsTitle": {
+    "description": "App bar title of the doctors browse list"
+  },
+
+  "searchDoctors": "Search by name or specialty",
+  "@searchDoctors": {
+    "description": "Hint of the doctors search field"
+  },
+
+  "allSpecialties": "All",
+  "@allSpecialties": {
+    "description": "Chip that clears the specialty filter"
+  },
+
+  "noDoctors": "No doctors yet",
+  "@noDoctors": {
+    "description": "Empty state when the doctors list is empty"
+  },
+
+  "noDoctorsSubtitle": "Doctors will appear here once they're available.",
+  "@noDoctorsSubtitle": {
+    "description": "Empty state body when there are no doctors at all"
+  },
+
+  "noMatches": "No doctors match",
+  "@noMatches": {
+    "description": "Empty state when search/filter yields no results"
+  },
+
+  "noMatchesSubtitle": "Try a different search or specialty.",
+  "@noMatchesSubtitle": {
+    "description": "Empty state body when search/filter yields no results"
+  },
+
+  "doctorProfile": "Doctor profile",
+  "@doctorProfile": {
+    "description": "App bar title of the doctor profile page"
+  },
+
+  "profileBio": "About",
+  "@profileBio": {
+    "description": "Section heading for the doctor's bio"
+  },
+
+  "profileClinic": "Clinic",
+  "@profileClinic": {
+    "description": "Section heading for the clinic address"
+  },
+
+  "browseDoctors": "Browse doctors",
+  "@browseDoctors": {
+    "description": "Gallery entry button that opens the doctors list"
   }
 }
