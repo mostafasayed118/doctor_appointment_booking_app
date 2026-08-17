@@ -1,7 +1,30 @@
-// DRAFT — Task 10. Finalized and deployed in Task 15 (firestore-rules).
-// Level 1 per plan 2.4: the catalog (doctors/slots) is public read-only,
-// and patients can only touch their own appointments. Seed writes bypass
-// these rules (admin SDK).
+// Level 1 security rules (plan 2.4) — finalized in Task 15.
+//
+// Model: the catalog (doctors/slots) is public read-only, patients manage
+// their own appointments, and a slot's availability is a lock that patients
+// flip — but ONLY the isBooked field, and only when authenticated. The
+// authoritative concurrency/ownership checks live in the app's Firestore
+// transactions (Tasks 12–14); these rules are defense-in-depth:
+//
+//   - No anonymous writes anywhere.
+//   - Catalog data (names, specialties, times, doctorId…) can't be tampered
+//     with via the client — the seed script (admin SDK) is the only writer
+//     of doctors and slots, and it bypasses these rules.
+//   - Appointments are strictly personal: read/create/update only for the
+//     signed-in owner, and a created appointment must reference a real slot
+//     whose doctorId matches (you can't fabricate an appointment for a
+//     doctor you never booked).
+//   - Slots may be flipped (booked ⇄ free) by any authenticated user — the
+//     known Level 1 tradeoff: the slot doc is the concurrency lock and
+//     carries no owner, so the flip can't be bound to an appointment yet.
+//
+// LEVEL 2 (future): store appointmentId on the slot doc at booking time,
+// then bind the flip to its owner in the rule:
+//   allow update: if request.auth != null
+//       && get(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId)).data.patientId == request.auth.uid;
+// That makes double-booking and unbooking-by-others impossible at the rules
+// layer too, at the cost of a schema change across the booking/cancel/
+// reschedule transactions.
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -12,18 +35,34 @@ service cloud.firestore {
     }
     match /slots/{slotId} {
       allow read: if true;
-      allow write: if false;
+      // Book, cancel, and reschedule all flip isBooked — never any other
+      // field (the transactions write exactly this shape, so the catalog
+      // data in a slot doc stays tamper-proof).
+      allow update: if request.auth != null
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isBooked']);
+      allow create, delete: if false;
     }
 
     // Patients manage their own appointments only.
     match /appointments/{appointmentId} {
       allow read: if request.auth != null
           && resource.data.patientId == request.auth.uid;
+      // The booking transaction creates an appointment for the signed-in
+      // patient, still scheduled, referencing a slot whose doctorId matches
+      // (get() join — robust to the slot's in-transaction isBooked update
+      // because only doctorId is compared, and that field never changes).
       allow create: if request.auth != null
-          && request.resource.data.patientId == request.auth.uid;
-      // Covers cancel (status → cancelled) and reschedule (Task 13/14).
+          && request.resource.data.patientId == request.auth.uid
+          && request.resource.data.status == 'scheduled'
+          && request.resource.data.slotId is string
+          && request.resource.data.doctorId ==
+              get(/databases/$(database)/documents/slots/$(request.resource.data.slotId)).data.doctorId;
+      // Covers cancel (status → cancelled, cancelledAt) and reschedule
+      // (slotId/startTime/endTime). Ownership must hold before AND after so
+      // an appointment can't be transferred to another patient.
       allow update: if request.auth != null
-          && resource.data.patientId == request.auth.uid;
+          && resource.data.patientId == request.auth.uid
+          && request.resource.data.patientId == request.auth.uid;
       allow delete: if false;
     }
   }

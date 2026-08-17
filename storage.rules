@@ -1,5 +1,6 @@
-// DRAFT — Task 10. Finalized and deployed in Task 15 (firestore-rules).
-// Doctor photos are public catalog assets; nothing writes via the client.
+// Doctor photos are public catalog assets (the app loads them by URL with
+// no auth); nothing writes via the client — the seed script (admin SDK)
+// uploads them and bypasses these rules.
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
