@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/components/app_error_view.dart';
 import '../../../shared/components/app_text_field.dart';
+import '../../../shared/components/constrained_content.dart';
 import '../../../shared/components/empty_state.dart';
 import '../../../shared/components/language_toggle_button.dart';
 import '../../../shared/components/loading_view.dart';
@@ -63,8 +64,10 @@ class _DoctorsListPageState extends State<DoctorsListPage> {
           final cubit = context.read<DoctorsListCubit>();
           return switch (state) {
             DoctorsInitial() || DoctorsLoading() => const LoadingView(),
-            DoctorsError(:final error) =>
-              AppErrorView(error: error, onRetry: cubit.load),
+            DoctorsError(:final error) => AppErrorView(
+              error: error,
+              onRetry: cubit.load,
+            ),
             DoctorsLoaded() => _buildContent(context, l10n, state),
           };
         },
@@ -77,47 +80,54 @@ class _DoctorsListPageState extends State<DoctorsListPage> {
     AppLocalizations l10n,
     DoctorsLoaded state,
   ) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-          child: AppTextField(
-            controller: _searchController,
-            label: l10n.searchDoctors,
-            prefixIcon: Icons.search,
-            onChanged: context.read<DoctorsListCubit>().search,
+    return ConstrainedContent(
+      // Keep the search/list a readable width on tablet/desktop instead of
+      // stretching edge-to-edge (a multi-column grid is a bigger redesign,
+      // out of scope for this pass).
+      maxWidth: 900,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            child: AppTextField(
+              controller: _searchController,
+              label: l10n.searchDoctors,
+              prefixIcon: Icons.search,
+              onChanged: context.read<DoctorsListCubit>().search,
+            ),
           ),
-        ),
-        SpecialtyFilterBar(
-          specialties: distinctSpecialties(state.allDoctors),
-          selected: state.selectedSpecialty,
-          allLabel: l10n.allSpecialties,
-          onSelected: context.read<DoctorsListCubit>().filterBySpecialty,
-        ),
-        Expanded(
-          child: state.filteredDoctors.isEmpty
-              ? EmptyState(
-                  icon: state.isFiltering
-                      ? Icons.search_off
-                      : Icons.medical_services_outlined,
-                  title: state.isFiltering ? l10n.noMatches : l10n.noDoctors,
-                  subtitle:
-                      state.isFiltering ? l10n.noMatchesSubtitle : l10n.noDoctorsSubtitle,
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: state.filteredDoctors.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final doctor = state.filteredDoctors[index];
-                    return DoctorCard(
-                      doctor: doctor,
-                      onTap: () => context.push('/doctors/${doctor.id}'),
-                    );
-                  },
-                ),
-        ),
-      ],
+          SpecialtyFilterBar(
+            specialties: distinctSpecialties(state.allDoctors),
+            selected: state.selectedSpecialty,
+            allLabel: l10n.allSpecialties,
+            onSelected: context.read<DoctorsListCubit>().filterBySpecialty,
+          ),
+          Expanded(
+            child: state.filteredDoctors.isEmpty
+                ? EmptyState(
+                    icon: state.isFiltering
+                        ? Icons.search_off
+                        : Icons.medical_services_outlined,
+                    title: state.isFiltering ? l10n.noMatches : l10n.noDoctors,
+                    subtitle: state.isFiltering
+                        ? l10n.noMatchesSubtitle
+                        : l10n.noDoctorsSubtitle,
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: state.filteredDoctors.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final doctor = state.filteredDoctors[index];
+                      return DoctorCard(
+                        doctor: doctor,
+                        onTap: () => context.push('/doctors/${doctor.id}'),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }

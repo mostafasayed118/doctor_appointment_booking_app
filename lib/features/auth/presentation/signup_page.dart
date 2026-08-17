@@ -7,6 +7,7 @@ import '../../../shared/components/app_error_view.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/components/app_text_field.dart';
+import '../../../shared/components/constrained_content.dart';
 import '../../../shared/components/language_toggle_button.dart';
 import 'auth_cubit.dart';
 import 'auth_state.dart';
@@ -47,8 +48,9 @@ class _SignupPageState extends State<SignupPage> {
 
     setState(() {
       _nameError = name.isEmpty ? l10n.enterYourName : null;
-      _emailError =
-          (email.isEmpty || !email.contains('@')) ? l10n.enterValidEmail : null;
+      _emailError = (email.isEmpty || !email.contains('@'))
+          ? l10n.enterValidEmail
+          : null;
       _passwordError = password.length < 8 ? l10n.passwordTooShort : null;
     });
 
@@ -73,73 +75,77 @@ class _SignupPageState extends State<SignupPage> {
         builder: (context, state) {
           return switch (state) {
             Authenticated(:final user) => SignedInView(
-                user: user,
-                onSignOut: cubit.signOut,
-              ),
+              user: user,
+              onSignOut: cubit.signOut,
+            ),
             AuthError(:final error) => AppErrorView(
-                error: error,
-                // Retry recovers to the form (fields keep their values)
-                // so the user can correct and resubmit — no reload needed.
-                onRetry: cubit.reset,
-              ),
-            AuthLoading() || AuthInitial() || Unauthenticated() =>
-              _buildForm(l10n, cubit, state is AuthLoading),
+              error: error,
+              // Retry recovers to the form (fields keep their values)
+              // so the user can correct and resubmit — no reload needed.
+              onRetry: cubit.reset,
+            ),
+            AuthLoading() ||
+            AuthInitial() ||
+            Unauthenticated() => _buildForm(l10n, cubit, state is AuthLoading),
           };
         },
       ),
     );
   }
 
-  Widget _buildForm(
-    AppLocalizations l10n,
-    AuthCubit cubit,
-    bool loading,
-  ) {
+  Widget _buildForm(AppLocalizations l10n, AuthCubit cubit, bool loading) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppTextField(
-            controller: _nameController,
-            label: l10n.fullName,
-            errorText: _nameError,
-            textInputAction: TextInputAction.next,
-            autofillHints: const [AutofillHints.name],
+      child: ConstrainedContent(
+        // Forms stay a readable width on tablet/desktop instead of
+        // stretching edge-to-edge.
+        maxWidth: 480,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppTextField(
+                controller: _nameController,
+                label: l10n.fullName,
+                errorText: _nameError,
+                textInputAction: TextInputAction.next,
+                autofillHints: const [AutofillHints.name],
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _emailController,
+                label: l10n.email,
+                hint: 'you@example.com',
+                errorText: _emailError,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                autofillHints: const [AutofillHints.email],
+              ),
+              const SizedBox(height: 16),
+              AppTextField(
+                controller: _passwordController,
+                label: l10n.password,
+                obscureText: true,
+                errorText: _passwordError,
+                textInputAction: TextInputAction.done,
+                autofillHints: const [AutofillHints.newPassword],
+                onSubmitted: (_) => _submit(cubit),
+              ),
+              const SizedBox(height: 24),
+              AppButton(
+                label: l10n.signUp,
+                icon: Icons.person_add,
+                loading: loading,
+                onPressed: () => _submit(cubit),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => context.go('/login'),
+                child: Text(l10n.haveAccountPrompt),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          AppTextField(
-            controller: _emailController,
-            label: l10n.email,
-            hint: 'you@example.com',
-            errorText: _emailError,
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
-            autofillHints: const [AutofillHints.email],
-          ),
-          const SizedBox(height: 16),
-          AppTextField(
-            controller: _passwordController,
-            label: l10n.password,
-            obscureText: true,
-            errorText: _passwordError,
-            textInputAction: TextInputAction.done,
-            autofillHints: const [AutofillHints.newPassword],
-            onSubmitted: (_) => _submit(cubit),
-          ),
-          const SizedBox(height: 24),
-          AppButton(
-            label: l10n.signUp,
-            icon: Icons.person_add,
-            loading: loading,
-            onPressed: () => _submit(cubit),
-          ),
-          const SizedBox(height: 12),
-          TextButton(
-            onPressed: () => context.go('/login'),
-            child: Text(l10n.haveAccountPrompt),
-          ),
-        ],
+        ),
       ),
     );
   }

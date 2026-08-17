@@ -6,6 +6,7 @@ import '../../../core/entities/appointment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/components/app_button.dart';
 import '../../../shared/components/app_error_view.dart';
+import '../../../shared/components/constrained_content.dart';
 import '../../../shared/components/empty_state.dart';
 import '../../../shared/components/language_toggle_button.dart';
 import '../../../shared/components/loading_view.dart';
@@ -79,65 +80,77 @@ class SlotSelectionPage extends StatelessWidget {
       );
     }
     final selectedDay = state.selectedDay;
-    return Column(
-      children: [
-        DaySelector(
-          days: state.days,
-          selectedIndex: state.selectedDayIndex,
-          onSelected: cubit.selectDay,
-        ),
-        Expanded(
-          child: selectedDay.hasSlots
-              ? GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: 2.2,
+    return ConstrainedContent(
+      // Capping the width keeps tiles a sane size on tablet/desktop; the
+      // grid below adapts its column count to whatever width it gets.
+      maxWidth: 900,
+      child: Column(
+        children: [
+          DaySelector(
+            days: state.days,
+            selectedIndex: state.selectedDayIndex,
+            onSelected: cubit.selectDay,
+          ),
+          Expanded(
+            child: selectedDay.hasSlots
+                ? GridView.builder(
+                    padding: const EdgeInsets.all(16),
+                    // Auto-computed columns (~130dp tiles): ~3 on a phone,
+                    // more on tablet/desktop — no hard-coded breakpoints.
+                    gridDelegate:
+                        const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 130,
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: 2.2,
+                        ),
+                    itemCount: selectedDay.slots.length,
+                    itemBuilder: (context, index) {
+                      final slot = selectedDay.slots[index];
+                      return SlotTile(
+                        slot: slot,
+                        selected: state.selectedSlot?.id == slot.id,
+                        onTap: () => cubit.selectSlot(slot),
+                      );
+                    },
+                  )
+                : EmptyState(
+                    icon: Icons.event_busy,
+                    title: l10n.noSlotsThisDay,
+                    subtitle: l10n.noSlotsThisDaySubtitle,
                   ),
-                  itemCount: selectedDay.slots.length,
-                  itemBuilder: (context, index) {
-                    final slot = selectedDay.slots[index];
-                    return SlotTile(
-                      slot: slot,
-                      selected: state.selectedSlot?.id == slot.id,
-                      onTap: () => cubit.selectSlot(slot),
-                    );
-                  },
-                )
-              : EmptyState(
-                  icon: Icons.event_busy,
-                  title: l10n.noSlotsThisDay,
-                  subtitle: l10n.noSlotsThisDaySubtitle,
-                ),
-        ),
-        // Confirm is only possible once a tile is selected; the slot rides
-        // along as router `extra` so the confirmation route doesn't need a
-        // second fetch (deep-link restores of /confirm have no extra and
-        // bounce back here).
-        SafeArea(
-          minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: state.selectedSlot == null
-              ? const SizedBox.shrink()
-              : AppButton(
-                  label: reschedule != null
-                      ? l10n.rescheduleAppointment
-                      : l10n.confirmBooking,
-                  icon: Icons.check,
-                  // Relative 'confirm': resolved against the current route,
-                  // so book mode lands on /doctors/:id/book/confirm and
-                  // reschedule mode on /appointments/reschedule/confirm
-                  // with the same code path — only the extra shape differs.
-                  onPressed: () => context.push(
-                    'confirm',
-                    extra: reschedule != null
-                        ? (reschedule!, state.selectedSlot)
-                        : state.selectedSlot,
+          ),
+          // Confirm is only possible once a tile is selected; the slot rides
+          // along as router `extra` so the confirmation route doesn't need a
+          // second fetch (deep-link restores of /confirm have no extra and
+          // bounce back here).
+          SafeArea(
+            minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: state.selectedSlot == null
+                ? const SizedBox.shrink()
+                : AppButton(
+                    label: reschedule != null
+                        ? l10n.rescheduleAppointment
+                        : l10n.confirmBooking,
+                    icon: Icons.check,
+                    // Explicit absolute targets: a relative push('confirm')
+                    // does NOT resolve to these nested routes in GoRouter
+                    // (it ends up unmatchable — caught by the responsive
+                    // widget tests), so each mode names its own confirm route;
+                    // only the extra shape differs.
+                    onPressed: () => reschedule != null
+                        ? context.push(
+                            '/appointments/reschedule/confirm',
+                            extra: (reschedule!, state.selectedSlot),
+                          )
+                        : context.push(
+                            '/doctors/${state.doctorId}/book/confirm',
+                            extra: state.selectedSlot,
+                          ),
                   ),
-                ),
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

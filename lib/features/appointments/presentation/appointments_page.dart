@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/entities/appointment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/components/app_error_view.dart';
+import '../../../shared/components/constrained_content.dart';
 import '../../../shared/components/empty_state.dart';
 import '../../../shared/components/language_toggle_button.dart';
 import '../../../shared/components/loading_view.dart';
@@ -32,14 +33,13 @@ class AppointmentsPage extends StatelessWidget {
         builder: (context, state) {
           final cubit = context.read<AppointmentsCubit>();
           return switch (state) {
-            AppointmentsInitial() || AppointmentsLoading() =>
-              const LoadingView(),
+            AppointmentsInitial() ||
+            AppointmentsLoading() => const LoadingView(),
             AppointmentsError(:final error) => AppErrorView(
               error: error,
               onRetry: cubit.retry,
             ),
-            AppointmentsLoaded() =>
-              _buildContent(context, l10n, state, cubit),
+            AppointmentsLoaded() => _buildContent(context, l10n, state, cubit),
           };
         },
       ),
@@ -52,22 +52,30 @@ class AppointmentsPage extends StatelessWidget {
     AppointmentsLoaded state,
     AppointmentsCubit cubit,
   ) {
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          TabBar(
-            tabs: [Tab(text: l10n.upcomingTab), Tab(text: l10n.pastTab)],
-          ),
-          Expanded(
-            child: TabBarView(
-              children: [
-                _buildList(context, l10n, state, cubit, upcoming: true),
-                _buildList(context, l10n, state, cubit, upcoming: false),
+    return ConstrainedContent(
+      // Tabs + cards read best as a centered ~900-wide column on
+      // tablet/desktop instead of stretching edge-to-edge.
+      maxWidth: 900,
+      child: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            TabBar(
+              tabs: [
+                Tab(text: l10n.upcomingTab),
+                Tab(text: l10n.pastTab),
               ],
             ),
-          ),
-        ],
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _buildList(context, l10n, state, cubit, upcoming: true),
+                  _buildList(context, l10n, state, cubit, upcoming: false),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -60,77 +60,84 @@ class AppointmentCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
+        // Two rows instead of one wide row: the header (photo, content,
+        // badge) on top, the actions BELOW it at full card width — so the
+        // buttons wrap naturally on narrow phones instead of squeezing the
+        // content or overflowing the row.
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (doctor != null)
-              DoctorPhoto(doctor: doctor!, radius: 28)
-            else
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                foregroundColor: theme.colorScheme.onSurfaceVariant,
-                child: const Icon(Icons.person_outline),
-              ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(doctorName, style: theme.textTheme.titleMedium),
-                  if (doctor != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      doctor!.specialty,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                  Text(date, style: theme.textTheme.bodyMedium),
-                  const SizedBox(height: 2),
-                  Text(
-                    timeRange,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppointmentStatusBadge(status: appointment.status),
-                if (onCancel != null || onReschedule != null) ...[
-                  const SizedBox(height: 8),
-                  if (cancelling)
-                    const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  else
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (onReschedule != null)
-                          TextButton(
-                            onPressed: onReschedule,
-                            child: Text(l10n.rescheduleAppointment),
+                if (doctor != null)
+                  DoctorPhoto(doctor: doctor!, radius: 28)
+                else
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    foregroundColor: theme.colorScheme.onSurfaceVariant,
+                    child: const Icon(Icons.person_outline),
+                  ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(doctorName, style: theme.textTheme.titleMedium),
+                      if (doctor != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          doctor!.specialty,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
-                        if (onCancel != null)
-                          OutlinedButton(
-                            onPressed: onCancel,
-                            child: Text(l10n.cancelAppointment),
-                          ),
+                        ),
                       ],
-                    ),
-                ],
+                      const SizedBox(height: 8),
+                      Text(date, style: theme.textTheme.bodyMedium),
+                      const SizedBox(height: 2),
+                      Text(
+                        timeRange,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                AppointmentStatusBadge(status: appointment.status),
               ],
             ),
+            if (onCancel != null || onReschedule != null) ...[
+              const SizedBox(height: 8),
+              if (cancelling)
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                // Full card width, so on narrow phones the two buttons fold
+                // to a second line rather than overflowing.
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [
+                    if (onReschedule != null)
+                      TextButton(
+                        onPressed: onReschedule,
+                        child: Text(l10n.rescheduleAppointment),
+                      ),
+                    if (onCancel != null)
+                      OutlinedButton(
+                        onPressed: onCancel,
+                        child: Text(l10n.cancelAppointment),
+                      ),
+                  ],
+                ),
+            ],
           ],
         ),
       ),
