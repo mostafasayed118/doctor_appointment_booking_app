@@ -10,8 +10,9 @@
 // and lib/core/entities/time_slot.dart):
 //   doctors/<stable id>                     8 sample doctors
 //   slots/<doctorId>__<start ISO no colons> hourly Mon–Sat slots, next 14 days
-//   storage: doctor-photos/<doctor-id>.png  generated avatars (or real photos
+//   public/doctor-photos/<doctor-id>.png    generated avatars (or real photos
 //                                           dropped into tool/seed/data/images/)
+//                                           — deploy with `firebase deploy --only hosting`
 //
 // Idempotency: every document uses a deterministic id + set(), so re-running
 // overwrites in place and never creates duplicates.
@@ -47,8 +48,17 @@ function readProjectId() {
 }
 
 const PROJECT_ID = readProjectId();
-const STORAGE_BUCKET =
-  process.env.FIREBASE_STORAGE_BUCKET || `${PROJECT_ID}.firebasestorage.app`;
+// Doctor photos are static files served by Firebase Hosting (free on the
+// Spark plan — no Storage bucket, no billing). The seed writes the PNGs into
+// the hosting public dir; `firebase deploy --only hosting` uploads them.
+const HOSTING_ORIGIN = `https://${PROJECT_ID}.web.app`;
+const HOSTING_PUBLIC_DIR = path.join(
+  __dirname,
+  '..',
+  '..',
+  'public',
+  'doctor-photos',
+);
 
 /// Locates the service-account key: explicit env var, then the two obvious
 /// project paths, then the standard `*-firebase-adminsdk-*.json` filename in
@@ -114,7 +124,7 @@ async function run() {
 
   if (DRY_RUN) {
     console.log(`[dry-run] Project:            ${PROJECT_ID}`);
-    console.log(`[dry-run] Storage bucket:     ${STORAGE_BUCKET}`);
+    console.log(`[dry-run] Hosting origin:     ${HOSTING_ORIGIN}`);
     console.log(`[dry-run] Doctors:            ${doctors.length}`);
     console.log(
       `[dry-run] Slots:               ${allSlots.length} ` +
@@ -123,6 +133,7 @@ async function run() {
     console.log(
       `[dry-run] Images:              ${doctors.length} → doctor-photos/<doctor-id>.png`,
     );
+    console.log('[dry-run] Deploy photos:      firebase deploy --only hosting');
     console.log('[dry-run] No writes performed.');
     return;
   }
@@ -139,49 +150,26 @@ async function run() {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsPath;
   admin.initializeApp({
     credential: admin.credential.applicationDefault(),
-    storageBucket: STORAGE_BUCKET,
   });
   const db = admin.firestore();
-  const bucket = admin.storage().bucket();
 
-  console.log(`Seeding project ${PROJECT_ID} (bucket: ${STORAGE_BUCKET})…`);
+  console.log(`Seeding project ${PROJECT_ID} (photos → ${HOSTING_ORIGIN})…`);
 
-  // 1. Upload photos first so the doctors get stable download URLs. Real
-  //    photos in data/images/<id>.png win over generated avatars.
-  //    If the storage bucket doesn't exist yet (project without billing /
-  //    Storage not provisioned), degrade to an empty photoUrl — the app
-  //    falls back to initials avatars — and warn so a later re-run after
-  //    provisioning upgrades the photos (idempotent set()).
+  // 1. Write the doctor photos as static files for Firebase Hosting (real
+  //    photos in data/images/<id>.png win over generated avatars), so the
+  //    doctors get stable photoUrl values. Deploy them afterwards with
+  //    `firebase deploy --only hosting` — re-running the seed overwrites the
+  //    files in place, so it stays idempotent.
+  fs.mkdirSync(HOSTING_PUBLIC_DIR, { recursive: true });
   const uploads = [];
-  let photosUploaded = 0;
   for (const doctor of doctors) {
-    try {
-      const photo = readOverridePhoto(doctor.id) ?? generateDoctorPhoto(doctor.id);
-      const objectPath = `doctor-photos/${doctor.id}.png`;
-      await bucket.file(objectPath).save(photo, {
-        contentType: 'image/png',
-        metadata: { cacheControl: 'public, max-age=86400' },
-      });
-      const url =
-        `https://firebasestorage.googleapis.com/v0/b/${STORAGE_BUCKET}/o/` +
-        `${encodeURIComponent(objectPath)}?alt=media`;
-      uploads.push({ doctor, url });
-      photosUploaded++;
-    } catch (error) {
-      const msg = String(error && error.message ? error.message : error);
-      if (msg.includes('bucket does not exist')) {
-        console.warn(
-          `  ⚠ storage bucket ${STORAGE_BUCKET} not available; ` +
-            `${doctor.id} photoUrl left empty (app shows initials). ` +
-            `Provision Storage (console → Storage → Get started), then re-run.`,
-        );
-        uploads.push({ doctor, url: '' });
-      } else {
-        throw error;
-      }
-    }
+    const photo = readOverridePhoto(doctor.id) ?? generateDoctorPhoto(doctor.id);
+    const objectPath = `doctor-photos/${doctor.id}.png`;
+    fs.writeFileSync(path.join(HOSTING_PUBLIC_DIR, `${doctor.id}.png`), photo);
+    const url = `${HOSTING_ORIGIN}/${objectPath}`;
+    uploads.push({ doctor, url });
   }
-  console.log(`  ✓ uploaded ${photosUploaded}/${uploads.length} doctor photos`);
+  console.log(`  ✓ wrote ${uploads.length} doctor photos → ${HOSTING_PUBLIC_DIR}`);
 
   // 2. Doctors — one document per stable id (set = overwrite in place).
   await Promise.all(
@@ -213,7 +201,10 @@ async function run() {
   }
   console.log(`  ✓ wrote ${allSlots.length} slots`);
 
-  console.log(`Done. Doctors: ${doctors.length} · Slots: ${allSlots.length} · Images: ${photosUploaded}/${uploads.length}`);
+  console.log(
+    `Done. Doctors: ${doctors.length} · Slots: ${allSlots.length} · Photos: ${uploads.length}`,
+  );
+  console.log('Deploy the photos: firebase deploy --only hosting');
   console.log(
     'Note: re-seeding resets every slot to isBooked=false, wiping any test bookings.',
   );

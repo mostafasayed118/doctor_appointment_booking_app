@@ -52,6 +52,13 @@ tool/seed/service-account.json
 # Node (seed script dependencies)
 node_modules/
 
+# Generated doctor photos — the seed writes these into the hosting public
+# dir (deterministic output, regenerable via `node tool/seed/index.js`).
+public/
+
+# Firebase CLI local cache (project aliases, deploy metadata)
+.firebase/
+
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
