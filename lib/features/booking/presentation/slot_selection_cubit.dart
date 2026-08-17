@@ -22,16 +22,26 @@ class SlotSelectionCubit extends Cubit<SlotSelectionState> {
   final DateTime Function() _now;
 
   String? _lastDoctorId;
+  String? _excludedSlotId;
 
-  Future<void> load(String doctorId) async {
+  /// Loads a doctor's slots for [doctorId]. In reschedule mode (Task 14)
+  /// [excludedSlotId] is the appointment's CURRENT slot, which is dropped
+  /// before day-grouping so the patient can't pick the slot they already
+  /// have (in production it is `isBooked: true` anyway, so grouping would
+  /// filter it; the exclusion keeps fake/test data honest too).
+  Future<void> load(String doctorId, {String? excludedSlotId}) async {
     _lastDoctorId = doctorId;
+    _excludedSlotId = excludedSlotId;
     emit(const SlotSelectionLoading());
     final result = await _getSlots(doctorId);
     switch (result) {
       case Success(:final value):
+        final slots = excludedSlotId == null
+            ? value
+            : value.where((s) => s.id != excludedSlotId).toList();
         emit(SlotSelectionLoaded(
           doctorId: doctorId,
-          days: groupSlotsByDay(value, now: _now()),
+          days: groupSlotsByDay(slots, now: _now()),
         ));
       case Failure(:final error):
         emit(SlotSelectionError(error));
@@ -40,7 +50,7 @@ class SlotSelectionCubit extends Cubit<SlotSelectionState> {
 
   void retry() {
     final id = _lastDoctorId;
-    if (id != null) load(id);
+    if (id != null) load(id, excludedSlotId: _excludedSlotId);
   }
 
   /// Switches the visible day. A selected slot belongs to a specific day,

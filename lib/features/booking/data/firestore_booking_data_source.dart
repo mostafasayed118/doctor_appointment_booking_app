@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../core/entities/appointment.dart';
+import '../../appointments/data/firestore_appointments_data_source.dart'
+    show AppointmentAlreadyCancelledException;
 
 /// Thrown when a slot exists but can no longer be booked (already taken,
 /// or its start time has passed).
@@ -31,6 +33,12 @@ class SlotUnavailableException implements Exception {
 /// sees isBooked=true → [SlotUnavailableException]. Without reading the
 /// slot inside the transaction, both devices would write and the slot would
 /// be double-booked.
+///
+/// [rescheduleAppointment] is the same idea extended to three documents:
+/// the new slot is the concurrency unit for the move, the appointment doc
+/// (read first) is the ownership record that fixes WHICH slot is freed, and
+/// the old slot must still be booked — the guard that makes a stale
+/// double-reschedule abort instead of moving the appointment twice.
 class FirestoreBookingDataSource {
   FirestoreBookingDataSource({FirebaseFirestore? firestore})
     : _firestore = firestore ?? FirebaseFirestore.instance;
@@ -98,6 +106,114 @@ class FirestoreBookingDataSource {
       // The document carries the authoritative server timestamp; this
       // in-memory value is display-only (Task 13 reads real documents).
       createdAt: DateTime.now(),
+    );
+  }
+
+  Future<Appointment> rescheduleAppointment({
+    required String patientId,
+    required String appointmentId,
+    required String newSlotId,
+  }) async {
+    final appointmentRef =
+        _firestore.collection('appointments').doc(appointmentId);
+    final newSlotRef = _firestore.collection('slots').doc(newSlotId);
+
+    // Captured inside the transaction callback so the returned entity is
+    // built from the values the transaction actually committed with (on a
+    // retry, they reflect the final successful run).
+    Map<String, dynamic>? committedAppointment;
+    Map<String, dynamic>? committedNewSlot;
+
+    await _firestore.runTransaction((transaction) async {
+      // --- all reads, before any write (Firestore rule) ---
+      final appointmentSnapshot = await transaction.get(appointmentRef);
+      if (!appointmentSnapshot.exists) {
+        // Match the doctors/booking pattern: raise the SDK-shaped
+        // 'not-found' exception so the mapper yields NotFoundError.
+        throw FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'not-found',
+          message: 'Appointment $appointmentId was not found.',
+        );
+      }
+      final appointment = appointmentSnapshot.data() as Map<String, dynamic>;
+      // Ownership check: someone else's appointment is treated as
+      // non-existent (standard practice — no info leak, and it reuses the
+      // existing NotFoundError path).
+      if (appointment['patientId'] != patientId) {
+        throw FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'not-found',
+          message: 'Appointment $appointmentId was not found.',
+        );
+      }
+      if (appointment['status'] == 'cancelled') {
+        throw const AppointmentAlreadyCancelledException();
+      }
+
+      final newSlotSnapshot = await transaction.get(newSlotRef);
+      if (!newSlotSnapshot.exists) {
+        throw FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'not-found',
+          message: 'Slot $newSlotId was not found.',
+        );
+      }
+      final newSlot = newSlotSnapshot.data() as Map<String, dynamic>;
+      if (newSlot['isBooked'] == true) {
+        throw const SlotUnavailableException();
+      }
+      final newStart = (newSlot['startTime'] as Timestamp).toDate();
+      if (!newStart.isAfter(DateTime.now())) {
+        throw const SlotUnavailableException();
+      }
+
+      // The old slot is DERIVED from the appointment doc — the caller can't
+      // choose which slot to release. It must still be booked: a free old
+      // slot means a concurrent reschedule already moved this appointment,
+      // so this run is stale (Firestore retries the callback, making this
+      // the guard the loser of a double-reschedule converges to).
+      final oldSlotId = appointment['slotId'] as String?;
+      DocumentReference<Map<String, dynamic>>? oldSlotRef;
+      var oldSlotBooked = false;
+      if (oldSlotId != null) {
+        oldSlotRef = _firestore.collection('slots').doc(oldSlotId);
+        final oldSlotSnapshot = await transaction.get(oldSlotRef);
+        oldSlotBooked = oldSlotSnapshot.exists &&
+            oldSlotSnapshot.data()!['isBooked'] == true;
+      }
+      if (!oldSlotBooked) {
+        throw const SlotUnavailableException();
+      }
+
+      // --- writes ---
+      committedAppointment = appointment;
+      committedNewSlot = newSlot;
+      transaction.update(newSlotRef, {'isBooked': true});
+      // Re-point the appointment at the new slot; start/end are copied from
+      // the new slot doc (same denormalization as bookSlot). Status stays
+      // 'scheduled' — rescheduling is not a lifecycle change.
+      transaction.update(appointmentRef, {
+        'slotId': newSlotId,
+        'startTime': newSlot['startTime'],
+        'endTime': newSlot['endTime'],
+      });
+      transaction.update(oldSlotRef!, {'isBooked': false});
+    });
+
+    final appointment = committedAppointment!;
+    final newSlot = committedNewSlot!;
+    return Appointment(
+      id: appointmentId,
+      patientId: appointment['patientId'] as String,
+      doctorId: appointment['doctorId'] as String,
+      slotId: newSlotId,
+      // Timestamps are UTC instants (see the TimeSlot contract); toDate()
+      // yields local, so normalize.
+      startTime: (newSlot['startTime'] as Timestamp).toDate().toUtc(),
+      endTime: (newSlot['endTime'] as Timestamp).toDate().toUtc(),
+      status: AppointmentStatus.scheduled,
+      createdAt: (appointment['createdAt'] as Timestamp).toDate().toUtc(),
     );
   }
 }

@@ -10,11 +10,19 @@ import 'package:doctor_appointment_booking_app/features/booking/domain/booking_r
 /// constructs `FirebaseFirestore.instance`, which blocks on a platform
 /// channel that never answers in unit tests.
 class FakeBookingRepository implements BookingRepository {
-  FakeBookingRepository({this.onBookSlot});
+  FakeBookingRepository({this.onBookSlot, this.onReschedule});
 
   /// Optional handler so tests can force failures; defaults to success.
   final Future<Result<Appointment>> Function(String patientId, String slotId)?
   onBookSlot;
+
+  /// Optional handler for reschedule (Task 14) so tests can force failures;
+  /// defaults to success.
+  final Future<Result<Appointment>> Function(
+    String patientId,
+    String appointmentId,
+    String newSlotId,
+  )? onReschedule;
 
   @override
   Future<Result<Appointment>> bookSlot({
@@ -24,6 +32,17 @@ class FakeBookingRepository implements BookingRepository {
     final handler = onBookSlot;
     if (handler != null) return handler(patientId, slotId);
     return Future.value(Success(_appointment(patientId, slotId)));
+  }
+
+  @override
+  Future<Result<Appointment>> rescheduleAppointment({
+    required String patientId,
+    required String appointmentId,
+    required String newSlotId,
+  }) {
+    final handler = onReschedule;
+    if (handler != null) return handler(patientId, appointmentId, newSlotId);
+    return Future.value(Success(_appointment(patientId, newSlotId)));
   }
 
   Appointment _appointment(String patientId, String slotId) => Appointment(

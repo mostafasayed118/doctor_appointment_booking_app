@@ -89,6 +89,29 @@ void main() {
     );
 
     blocTest<SlotSelectionCubit, SlotSelectionState>(
+      'excludes the current slot in reschedule mode',
+      build: buildCubit,
+      setUp: () => when(() => repository.getSlots('d1')).thenAnswer(
+        (_) async => Success([
+          slot('current', DateTime(2026, 8, 15, 9)),
+          slot('other', DateTime(2026, 8, 15, 10)),
+        ]),
+      ),
+      act: (cubit) => cubit.load('d1', excludedSlotId: 'current'),
+      expect: () => [
+        const SlotSelectionLoading(),
+        SlotSelectionLoaded(
+          doctorId: 'd1',
+          days: [
+            SlotDay(day: DateTime(2026, 8, 15), slots: [
+              slot('other', DateTime(2026, 8, 15, 10)),
+            ]),
+          ],
+        ),
+      ],
+    );
+
+    blocTest<SlotSelectionCubit, SlotSelectionState>(
       'emits Loaded with empty days when there are no slots',
       build: buildCubit,
       setUp: () => when(() => repository.getSlots('d1'))
@@ -114,6 +137,41 @@ void main() {
   });
 
   group('retry', () {
+    blocTest<SlotSelectionCubit, SlotSelectionState>(
+      'retry keeps the excluded slot from the reschedule load',
+      build: buildCubit,
+      setUp: () {
+        var failFirst = true;
+        when(() => repository.getSlots('d1')).thenAnswer((_) async {
+          if (failFirst) {
+            failFirst = false;
+            return const Failure(core.NetworkError());
+          }
+          return Success([
+            slot('current', DateTime(2026, 8, 15, 9)),
+            slot('other', DateTime(2026, 8, 15, 10)),
+          ]);
+        });
+      },
+      act: (cubit) async {
+        await cubit.load('d1', excludedSlotId: 'current');
+        cubit.retry();
+      },
+      expect: () => [
+        const SlotSelectionLoading(),
+        const SlotSelectionError(core.NetworkError()),
+        const SlotSelectionLoading(),
+        SlotSelectionLoaded(
+          doctorId: 'd1',
+          days: [
+            SlotDay(day: DateTime(2026, 8, 15), slots: [
+              slot('other', DateTime(2026, 8, 15, 10)),
+            ]),
+          ],
+        ),
+      ],
+    );
+
     blocTest<SlotSelectionCubit, SlotSelectionState>(
       'reloads the last requested doctor after an error',
       build: buildCubit,

@@ -255,5 +255,25 @@
   "unknownDoctor": "Unknown doctor",
   "@unknownDoctor": {
     "description": "Placeholder name on an appointment card whose doctor document is missing from the lookup"
+  },
+
+  "rescheduleAppointment": "Reschedule",
+  "@rescheduleAppointment": {
+    "description": "Button on an upcoming appointment that opens slot selection in reschedule mode, and the confirm button there"
+  },
+
+  "rescheduleAppointmentTitle": "Reschedule appointment",
+  "@rescheduleAppointmentTitle": {
+    "description": "App bar title of the slot selection screen in reschedule mode"
+  },
+
+  "rescheduleConfirmedTitle": "Appointment rescheduled!",
+  "@rescheduleConfirmedTitle": {
+    "description": "Success heading on the confirmation page after an appointment is moved to a new slot"
+  },
+
+  "backToAppointments": "Back to appointments",
+  "@backToAppointments": {
+    "description": "Button on the reschedule confirmation page that returns to the appointments list"
   }
 }

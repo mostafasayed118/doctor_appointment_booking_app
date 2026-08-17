@@ -22,6 +22,7 @@ import '../features/booking/domain/booking_repository.dart';
 import '../features/booking/domain/slots_repository.dart';
 import '../features/booking/domain/use_cases/book_slot.dart';
 import '../features/booking/domain/use_cases/get_slots.dart';
+import '../features/booking/domain/use_cases/reschedule_appointment.dart';
 import '../features/booking/presentation/booking_cubit.dart';
 import '../features/booking/presentation/slot_selection_cubit.dart';
 import '../features/doctors/data/doctors_repository_impl.dart';
@@ -108,7 +109,13 @@ void setupLocator() {
   );
   sl.registerLazySingleton<BookSlot>(() => BookSlot(sl<BookingRepository>()));
   sl.registerFactory<BookingCubit>(
-    () => BookingCubit(bookSlot: sl<BookSlot>()),
+    () => BookingCubit(
+      bookSlot: sl<BookSlot>(),
+      rescheduleAppointment: sl<RescheduleAppointment>(),
+    ),
+  );
+  sl.registerLazySingleton<RescheduleAppointment>(
+    () => RescheduleAppointment(sl<BookingRepository>()),
   );
 
   sl.registerLazySingleton<FirestoreAppointmentsDataSource>(

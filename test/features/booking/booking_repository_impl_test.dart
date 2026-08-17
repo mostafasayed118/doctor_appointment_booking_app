@@ -6,6 +6,8 @@ import 'package:doctor_appointment_booking_app/core/entities/appointment.dart';
 import 'package:doctor_appointment_booking_app/core/error/app_error.dart';
 import 'package:doctor_appointment_booking_app/core/error/result.dart';
 import 'package:doctor_appointment_booking_app/data/error/firebase_error_mapper.dart';
+import 'package:doctor_appointment_booking_app/features/appointments/data/firestore_appointments_data_source.dart'
+    show AppointmentAlreadyCancelledException;
 import 'package:doctor_appointment_booking_app/features/booking/data/booking_repository_impl.dart';
 import 'package:doctor_appointment_booking_app/features/booking/data/firestore_booking_data_source.dart';
 
@@ -92,6 +94,116 @@ void main() {
       final result = await repository.bookSlot(patientId: 'p1', slotId: 's1');
 
       expect((result as Failure<Appointment>).error, isA<UnexpectedError>());
+    });
+  });
+
+  group('rescheduleAppointment', () {
+    test('returns Success with the moved appointment', () async {
+      when(
+        () => dataSource.rescheduleAppointment(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlotId: 's2',
+        ),
+      ).thenAnswer((_) async => appointment);
+
+      final result = await repository.rescheduleAppointment(
+        patientId: 'p1',
+        appointmentId: 'a1',
+        newSlotId: 's2',
+      );
+
+      expect(result, isA<Success<Appointment>>());
+      expect((result as Success<Appointment>).value, appointment);
+    });
+
+    test('maps the new-slot-taken business rule to '
+        'Failure<SlotUnavailableError>', () async {
+      when(
+        () => dataSource.rescheduleAppointment(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlotId: 's2',
+        ),
+      ).thenThrow(const SlotUnavailableException());
+
+      final result = await repository.rescheduleAppointment(
+        patientId: 'p1',
+        appointmentId: 'a1',
+        newSlotId: 's2',
+      );
+
+      expect(
+        (result as Failure<Appointment>).error,
+        isA<SlotUnavailableError>(),
+      );
+    });
+
+    test('maps the cancelled-appointment business rule to '
+        'Failure<AppointmentAlreadyCancelledError>', () async {
+      when(
+        () => dataSource.rescheduleAppointment(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlotId: 's2',
+        ),
+      ).thenThrow(const AppointmentAlreadyCancelledException());
+
+      final result = await repository.rescheduleAppointment(
+        patientId: 'p1',
+        appointmentId: 'a1',
+        newSlotId: 's2',
+      );
+
+      expect(
+        (result as Failure<Appointment>).error,
+        isA<AppointmentAlreadyCancelledError>(),
+      );
+    });
+
+    test('maps a missing appointment/new slot to Failure<NotFoundError>',
+        () async {
+      when(
+        () => dataSource.rescheduleAppointment(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlotId: 's2',
+        ),
+      ).thenThrow(
+        FirebaseException(
+          plugin: 'cloud_firestore',
+          code: 'not-found',
+          message: 'Appointment a1 was not found.',
+        ),
+      );
+
+      final result = await repository.rescheduleAppointment(
+        patientId: 'p1',
+        appointmentId: 'a1',
+        newSlotId: 's2',
+      );
+
+      expect((result as Failure<Appointment>).error, isA<NotFoundError>());
+    });
+
+    test('maps a network failure to Failure<NetworkError>', () async {
+      when(
+        () => dataSource.rescheduleAppointment(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlotId: 's2',
+        ),
+      ).thenThrow(
+        FirebaseException(plugin: 'cloud_firestore', code: 'unavailable'),
+      );
+
+      final result = await repository.rescheduleAppointment(
+        patientId: 'p1',
+        appointmentId: 'a1',
+        newSlotId: 's2',
+      );
+
+      expect((result as Failure<Appointment>).error, isA<NetworkError>());
     });
   });
 }

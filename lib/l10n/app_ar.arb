@@ -99,5 +99,13 @@
 
   "noPastAppointmentsSubtitle": "ستظهر المواعيد الملغاة والمكتملة هنا.",
 
-  "unknownDoctor": "طبيب غير معروف"
+  "unknownDoctor": "طبيب غير معروف",
+
+  "rescheduleAppointment": "إعادة الجدولة",
+
+  "rescheduleAppointmentTitle": "إعادة جدولة الموعد",
+
+  "rescheduleConfirmedTitle": "تمت إعادة جدولة الموعد!",
+
+  "backToAppointments": "العودة إلى المواعيد"
 }

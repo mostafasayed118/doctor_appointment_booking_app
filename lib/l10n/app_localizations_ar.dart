@@ -163,4 +163,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unknownDoctor => 'طبيب غير معروف';
+
+  @override
+  String get rescheduleAppointment => 'إعادة الجدولة';
+
+  @override
+  String get rescheduleAppointmentTitle => 'إعادة جدولة الموعد';
+
+  @override
+  String get rescheduleConfirmedTitle => 'تمت إعادة جدولة الموعد!';
+
+  @override
+  String get backToAppointments => 'العودة إلى المواعيد';
 }

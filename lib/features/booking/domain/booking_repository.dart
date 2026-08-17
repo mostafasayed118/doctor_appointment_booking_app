@@ -26,4 +26,28 @@ abstract interface class BookingRepository {
     required String patientId,
     required String slotId,
   });
+
+  /// Moves [appointmentId] (owned by [patientId]) to [newSlotId] in a
+  /// single atomic unit of work: the new slot is booked, the appointment is
+  /// re-pointed at it, and the old slot is freed — together, so a reschedule
+  /// can never strand an appointment without a slot or leak a booked slot.
+  ///
+  /// Only [appointmentId] + [newSlotId] are passed: the old slot, the
+  /// doctor, and the times are read from the authoritative documents inside
+  /// the transaction, never trusted from a caller-supplied copy.
+  ///
+  /// Failures are typed:
+  /// - [SlotUnavailableError] when the new slot can't be booked (taken,
+  ///   past, missing is [NotFoundError]) or the appointment's current slot
+  ///   is no longer booked (e.g. a concurrent reschedule already moved it).
+  /// - [AppointmentAlreadyCancelledError] when the appointment is cancelled.
+  /// - [NotFoundError] when the appointment or new slot does not exist
+  ///   (a not-owned appointment is treated as non-existent).
+  /// - [NetworkError]/[ServerError]/[UnexpectedError] via the error mapper
+  ///   for SDK-level failures.
+  Future<Result<Appointment>> rescheduleAppointment({
+    required String patientId,
+    required String appointmentId,
+    required String newSlotId,
+  });
 }

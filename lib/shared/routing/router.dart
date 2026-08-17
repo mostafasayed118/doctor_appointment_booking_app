@@ -10,6 +10,7 @@ import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/signup_page.dart';
 import '../../features/appointments/presentation/appointments_cubit.dart';
 import '../../features/appointments/presentation/appointments_page.dart';
+import '../../core/entities/appointment.dart';
 import '../../features/booking/presentation/booking_cubit.dart';
 import '../../features/booking/presentation/confirmation_page.dart';
 import '../../features/booking/presentation/slot_selection_cubit.dart';
@@ -96,6 +97,60 @@ GoRouter buildAppRouter(AuthCubit authCubit, {String initialLocation = '/'}) {
             child: const AppointmentsPage(),
           );
         },
+        routes: [
+          // Reschedule (Task 14): slot selection in reschedule mode. The
+          // appointment rides as `extra` so the cubit knows which doctor to
+          // load and which slot to exclude; deep-link restores have no
+          // extra and bounce back to the list.
+          GoRoute(
+            path: 'reschedule',
+            redirect: (context, state) =>
+                state.extra is Appointment ? null : '..',
+            builder: (context, state) {
+              final appointment = state.extra! as Appointment;
+              return BlocProvider(
+                create: (_) => sl<SlotSelectionCubit>()
+                  ..load(
+                    appointment.doctorId,
+                    excludedSlotId: appointment.slotId,
+                  ),
+                child: SlotSelectionPage(reschedule: appointment),
+              );
+            },
+            routes: [
+              GoRoute(
+                path: 'confirm',
+                // The extra is a (Appointment, TimeSlot) record — rescheduling
+                // without both is meaningless, so bounce back to slot
+                // selection.
+                redirect: (context, state) =>
+                    state.extra is (Appointment, TimeSlot) ? null : '..',
+                builder: (context, state) {
+                  // Same invariant as the book confirm route: the guard
+                  // guarantees an authenticated user by now.
+                  final authState = authCubit.state;
+                  if (authState is! Authenticated) {
+                    throw StateError(
+                      'Reschedule confirm route reached without an '
+                      'authenticated user.',
+                    );
+                  }
+                  final (appointment, slot) =
+                      state.extra! as (Appointment, TimeSlot);
+                  return BlocProvider(
+                    create: (_) => sl<BookingCubit>()
+                      ..reschedule(
+                        patientId: authState.user.uid,
+                        appointmentId: appointment.id,
+                        newSlot: slot,
+                      ),
+                    child: const ConfirmationPage(),
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: '/doctors',

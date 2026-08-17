@@ -39,6 +39,10 @@ class ConfirmationPage extends StatelessWidget {
           BookingConfirmed(:final appointment) => _SuccessView(
             appointment: appointment,
           ),
+          BookingRescheduled(:final appointment) => _SuccessView(
+            appointment: appointment,
+            rescheduled: true,
+          ),
         },
       ),
     );
@@ -46,9 +50,13 @@ class ConfirmationPage extends StatelessWidget {
 }
 
 class _SuccessView extends StatelessWidget {
-  const _SuccessView({required this.appointment});
+  const _SuccessView({required this.appointment, this.rescheduled = false});
 
   final Appointment appointment;
+
+  /// True after a reschedule (Task 14): the heading and the exit button
+  /// point at the appointments list instead of the doctors list.
+  final bool rescheduled;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +77,7 @@ class _SuccessView extends StatelessWidget {
           Icon(Icons.check_circle, size: 96, color: theme.colorScheme.primary),
           const SizedBox(height: 16),
           Text(
-            l10n.bookingConfirmedTitle,
+            rescheduled ? l10n.rescheduleConfirmedTitle : l10n.bookingConfirmedTitle,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineSmall,
           ),
@@ -87,8 +95,8 @@ class _SuccessView extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           AppButton(
-            label: l10n.backToDoctors,
-            onPressed: () => context.go('/doctors'),
+            label: rescheduled ? l10n.backToAppointments : l10n.backToDoctors,
+            onPressed: () => context.go(rescheduled ? '/appointments' : '/doctors'),
           ),
         ],
       ),

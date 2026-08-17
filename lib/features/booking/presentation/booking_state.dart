@@ -34,6 +34,18 @@ final class BookingConfirmed extends BookingState {
   List<Object?> get props => [appointment];
 }
 
+/// The appointment was moved to a new slot (Task 14) — show the reschedule
+/// success screen. Additive on purpose: Task 12's states are untouched, so
+/// the booking flow's tests keep passing unchanged.
+final class BookingRescheduled extends BookingState {
+  const BookingRescheduled(this.appointment);
+
+  final Appointment appointment;
+
+  @override
+  List<Object?> get props => [appointment];
+}
+
 /// Booking failed — slot taken/gone, network, or server error.
 final class BookingError extends BookingState {
   const BookingError(this.error);

@@ -397,6 +397,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown doctor'**
   String get unknownDoctor;
+
+  /// Button on an upcoming appointment that opens slot selection in reschedule mode, and the confirm button there
+  ///
+  /// In en, this message translates to:
+  /// **'Reschedule'**
+  String get rescheduleAppointment;
+
+  /// App bar title of the slot selection screen in reschedule mode
+  ///
+  /// In en, this message translates to:
+  /// **'Reschedule appointment'**
+  String get rescheduleAppointmentTitle;
+
+  /// Success heading on the confirmation page after an appointment is moved to a new slot
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment rescheduled!'**
+  String get rescheduleConfirmedTitle;
+
+  /// Button on the reschedule confirmation page that returns to the appointments list
+  ///
+  /// In en, this message translates to:
+  /// **'Back to appointments'**
+  String get backToAppointments;
 }
 
 class _AppLocalizationsDelegate

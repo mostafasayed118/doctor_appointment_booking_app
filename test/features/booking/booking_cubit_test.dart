@@ -8,10 +8,14 @@ import 'package:doctor_appointment_booking_app/core/error/app_error.dart'
     as core;
 import 'package:doctor_appointment_booking_app/core/error/result.dart';
 import 'package:doctor_appointment_booking_app/features/booking/domain/use_cases/book_slot.dart';
+import 'package:doctor_appointment_booking_app/features/booking/domain/use_cases/reschedule_appointment.dart';
 import 'package:doctor_appointment_booking_app/features/booking/presentation/booking_cubit.dart';
 import 'package:doctor_appointment_booking_app/features/booking/presentation/booking_state.dart';
 
 class MockBookSlot extends Mock implements BookSlot {}
+
+class MockRescheduleAppointment extends Mock
+    implements RescheduleAppointment {}
 
 TimeSlot slot(String id) => TimeSlot(
   id: id,
@@ -34,12 +38,17 @@ Appointment appointment() => Appointment(
 
 void main() {
   late MockBookSlot bookSlot;
+  late MockRescheduleAppointment rescheduleAppointment;
 
   setUp(() {
     bookSlot = MockBookSlot();
+    rescheduleAppointment = MockRescheduleAppointment();
   });
 
-  BookingCubit buildCubit() => BookingCubit(bookSlot: bookSlot);
+  BookingCubit buildCubit() => BookingCubit(
+    bookSlot: bookSlot,
+    rescheduleAppointment: rescheduleAppointment,
+  );
 
   group('initial state', () {
     test('starts in BookingInitial', () {
@@ -101,6 +110,50 @@ void main() {
     );
   });
 
+  group('reschedule', () {
+    blocTest<BookingCubit, BookingState>(
+      'emits Confirming then Rescheduled on success',
+      build: buildCubit,
+      setUp: () => when(
+        () => rescheduleAppointment(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlotId: 's2',
+        ),
+      ).thenAnswer((_) async => Success(appointment())),
+      act: (cubit) => cubit.reschedule(
+        patientId: 'p1',
+        appointmentId: 'a1',
+        newSlot: slot('s2'),
+      ),
+      expect: () => [
+        const BookingConfirming(),
+        BookingRescheduled(appointment()),
+      ],
+    );
+
+    blocTest<BookingCubit, BookingState>(
+      'emits Error with SlotUnavailableError when the new slot was taken',
+      build: buildCubit,
+      setUp: () => when(
+        () => rescheduleAppointment(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlotId: 's2',
+        ),
+      ).thenAnswer((_) async => const Failure(core.SlotUnavailableError())),
+      act: (cubit) => cubit.reschedule(
+        patientId: 'p1',
+        appointmentId: 'a1',
+        newSlot: slot('s2'),
+      ),
+      expect: () => [
+        const BookingConfirming(),
+        const BookingError(core.SlotUnavailableError()),
+      ],
+    );
+  });
+
   group('retry', () {
     blocTest<BookingCubit, BookingState>(
       're-runs confirm with the last patient and slot after an error',
@@ -114,6 +167,39 @@ void main() {
       },
       verify: (_) =>
           verify(() => bookSlot(patientId: 'p1', slotId: 's1')).called(2),
+      expect: () => [
+        const BookingConfirming(),
+        const BookingError(core.NetworkError()),
+        const BookingConfirming(),
+        const BookingError(core.NetworkError()),
+      ],
+    );
+
+    blocTest<BookingCubit, BookingState>(
+      're-runs the last reschedule after an error',
+      build: buildCubit,
+      setUp: () => when(
+        () => rescheduleAppointment(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlotId: 's2',
+        ),
+      ).thenAnswer((_) async => const Failure(core.NetworkError())),
+      act: (cubit) async {
+        await cubit.reschedule(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlot: slot('s2'),
+        );
+        cubit.retry();
+      },
+      verify: (_) => verify(
+        () => rescheduleAppointment(
+          patientId: 'p1',
+          appointmentId: 'a1',
+          newSlotId: 's2',
+        ),
+      ).called(2),
       expect: () => [
         const BookingConfirming(),
         const BookingError(core.NetworkError()),

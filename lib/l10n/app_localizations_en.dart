@@ -165,4 +165,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownDoctor => 'Unknown doctor';
+
+  @override
+  String get rescheduleAppointment => 'Reschedule';
+
+  @override
+  String get rescheduleAppointmentTitle => 'Reschedule appointment';
+
+  @override
+  String get rescheduleConfirmedTitle => 'Appointment rescheduled!';
+
+  @override
+  String get backToAppointments => 'Back to appointments';
 }

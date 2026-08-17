@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/entities/appointment.dart';
 import '../../../l10n/app_localizations.dart';
@@ -99,9 +100,12 @@ class AppointmentsPage extends StatelessWidget {
           doctor: state.doctorsById[appointment.doctorId],
           cancelling: state.cancellingId == appointment.id,
           // Only still-scheduled appointments (which is exactly the
-          // upcoming list) can be cancelled.
+          // upcoming list) can be cancelled or rescheduled.
           onCancel: upcoming
               ? () => _confirmCancel(context, cubit, appointment)
+              : null,
+          onReschedule: upcoming
+              ? () => _startReschedule(context, appointment)
               : null,
         );
       },
@@ -134,5 +138,13 @@ class AppointmentsPage extends StatelessWidget {
     if (confirmed == true) {
       cubit.cancel(appointment.id);
     }
+  }
+
+  /// Opens slot selection in reschedule mode (Task 14); the appointment
+  /// rides along as `extra` so the route knows which appointment to move
+  /// and which slot to exclude. No dialog — the reschedule confirm screen
+  /// is the confirmation moment.
+  void _startReschedule(BuildContext context, Appointment appointment) {
+    context.push('/appointments/reschedule', extra: appointment);
   }
 }

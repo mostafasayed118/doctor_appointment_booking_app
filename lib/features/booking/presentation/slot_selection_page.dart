@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/entities/appointment.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/components/app_button.dart';
 import '../../../shared/components/app_error_view.dart';
@@ -19,19 +20,31 @@ import 'widgets/slot_tile.dart';
 /// [SlotSelectionCubit] (already loading) above this page. Selection state
 /// lives in the cubit — Task 12's confirm flow consumes `selectedSlot`.
 class SlotSelectionPage extends StatelessWidget {
-  const SlotSelectionPage({super.key, this.doctorName});
+  const SlotSelectionPage({super.key, this.doctorName, this.reschedule});
 
   /// The doctor's name, passed via router `extra` from the profile page so
   /// the AppBar can show who is being booked (deep-link restores fall back
   /// to the generic localized title — `extra` isn't preserved across them).
   final String? doctorName;
 
+  /// Non-null in reschedule mode (Task 14): the appointment being moved.
+  /// Drives the AppBar title, the confirm button label, and the confirm
+  /// route's `extra` — a `(Appointment, TimeSlot)` record instead of a bare
+  /// [TimeSlot], so the reschedule transaction knows WHICH appointment to
+  /// move and which slot it is moving to.
+  final Appointment? reschedule;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(doctorName ?? l10n.bookAppointment),
+        title: Text(
+          doctorName ??
+              (reschedule != null
+                  ? l10n.rescheduleAppointmentTitle
+                  : l10n.bookAppointment),
+        ),
         actions: const [LanguageToggleButton()],
       ),
       body: BlocBuilder<SlotSelectionCubit, SlotSelectionState>(
@@ -108,11 +121,19 @@ class SlotSelectionPage extends StatelessWidget {
           child: state.selectedSlot == null
               ? const SizedBox.shrink()
               : AppButton(
-                  label: l10n.confirmBooking,
+                  label: reschedule != null
+                      ? l10n.rescheduleAppointment
+                      : l10n.confirmBooking,
                   icon: Icons.check,
+                  // Relative 'confirm': resolved against the current route,
+                  // so book mode lands on /doctors/:id/book/confirm and
+                  // reschedule mode on /appointments/reschedule/confirm
+                  // with the same code path — only the extra shape differs.
                   onPressed: () => context.push(
-                    '/doctors/${state.doctorId}/book/confirm',
-                    extra: state.selectedSlot,
+                    'confirm',
+                    extra: reschedule != null
+                        ? (reschedule!, state.selectedSlot)
+                        : state.selectedSlot,
                   ),
                 ),
         ),

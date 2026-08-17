@@ -20,6 +20,7 @@ class AppointmentCard extends StatelessWidget {
     required this.appointment,
     this.doctor,
     this.onCancel,
+    this.onReschedule,
     this.cancelling = false,
   });
 
@@ -32,6 +33,10 @@ class AppointmentCard extends StatelessWidget {
   /// the dialog lives in the page). Null hides the button, e.g. for
   /// appointments that can't be cancelled.
   final VoidCallback? onCancel;
+
+  /// Called when the patient taps Reschedule (Task 14) — the page pushes
+  /// the slot-selection screen in reschedule mode. Null hides the button.
+  final VoidCallback? onReschedule;
 
   /// True while this appointment's cancel transaction is in flight — shows
   /// a spinner instead of the button so a double-tap can't fire twice.
@@ -99,7 +104,7 @@ class AppointmentCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 AppointmentStatusBadge(status: appointment.status),
-                if (onCancel != null) ...[
+                if (onCancel != null || onReschedule != null) ...[
                   const SizedBox(height: 8),
                   if (cancelling)
                     const SizedBox(
@@ -108,9 +113,20 @@ class AppointmentCard extends StatelessWidget {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   else
-                    OutlinedButton(
-                      onPressed: onCancel,
-                      child: Text(l10n.cancelAppointment),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (onReschedule != null)
+                          TextButton(
+                            onPressed: onReschedule,
+                            child: Text(l10n.rescheduleAppointment),
+                          ),
+                        if (onCancel != null)
+                          OutlinedButton(
+                            onPressed: onCancel,
+                            child: Text(l10n.cancelAppointment),
+                          ),
+                      ],
                     ),
                 ],
               ],
