@@ -81,8 +81,9 @@ void main() {
     expect(find.text('Doctors'), findsOneWidget);
   });
 
-  testWidgets('a deep link to /doctors/d1 is restored after sign-in',
-      (tester) async {
+  testWidgets('a deep link to /doctors/d1 is restored after sign-in', (
+    tester,
+  ) async {
     // Start pointed at a protected profile deep link: the guard bounces to
     // /login and remembers where the user wanted to go.
     final harness = buildTestApp(
@@ -116,6 +117,29 @@ void main() {
     // Sign-out success is reported by the auth state stream — the cubit
     // waits for it (single source of truth for identity).
     await harness.cubit.signOut();
+    await tester.pump();
+    harness.repository.emitAuthState(null);
+    await settleTransition(tester);
+
+    expect(find.text('Sign in'), findsWidgets);
+    expect(find.text('Doctors'), findsNothing);
+  });
+
+  testWidgets('the doctors app bar sign-out action returns to /login', (
+    tester,
+  ) async {
+    // The user-facing sign-out entry: the AppBar action on the post-auth
+    // landing (previously sign-out only existed in the dev gallery).
+    final harness = buildTestApp(
+      repository: FakeAuthRepository(),
+      initialUser: user,
+    );
+
+    await tester.pumpWidget(harness.app);
+    await settleTransition(tester);
+    expect(find.text('Doctors'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Sign out'));
     await tester.pump();
     harness.repository.emitAuthState(null);
     await settleTransition(tester);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../features/auth/presentation/auth_cubit.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/components/app_error_view.dart';
 import '../../../shared/components/app_text_field.dart';
@@ -48,6 +49,13 @@ class _DoctorsListPageState extends State<DoctorsListPage> {
             icon: const Icon(Icons.calendar_month_outlined),
             tooltip: l10n.appointmentsTitle,
             onPressed: () => context.push('/appointments'),
+          ),
+          // Sign out — the auth guard redirects to /login automatically on
+          // the state change (authCubit is GoRouter's refreshListenable).
+          IconButton(
+            icon: const Icon(Icons.logout_outlined),
+            tooltip: l10n.signOut,
+            onPressed: () => context.read<AuthCubit>().signOut(),
           ),
           const LanguageToggleButton(),
           // Dev-only: the component gallery is no longer the landing, so

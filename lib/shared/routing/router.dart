@@ -164,9 +164,14 @@ GoRouter buildAppRouter(AuthCubit authCubit, {String initialLocation = '/'}) {
       ),
       GoRoute(
         path: '/doctors',
-        builder: (context, state) => BlocProvider(
-          create: (_) => sl<DoctorsListCubit>()..load(),
-          child: const DoctorsListPage(),
+        builder: (context, state) => BlocProvider.value(
+          // The landing page's AppBar hosts the sign-out action, so the
+          // app-global AuthCubit rides along (same pattern as /login).
+          value: authCubit,
+          child: BlocProvider(
+            create: (_) => sl<DoctorsListCubit>()..load(),
+            child: const DoctorsListPage(),
+          ),
         ),
         routes: [
           GoRoute(
