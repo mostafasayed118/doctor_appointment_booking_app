@@ -92,9 +92,14 @@ GoRouter buildAppRouter(AuthCubit authCubit, {String initialLocation = '/'}) {
               'Appointments route reached without an authenticated user.',
             );
           }
-          return BlocProvider(
-            create: (_) => sl<AppointmentsCubit>()..load(authState.user.uid),
-            child: const AppointmentsPage(),
+          // The page's AppBar hosts the sign-out action, so the app-global
+          // AuthCubit rides along (same pattern as /doctors).
+          return BlocProvider.value(
+            value: authCubit,
+            child: BlocProvider(
+              create: (_) => sl<AppointmentsCubit>()..load(authState.user.uid),
+              child: const AppointmentsPage(),
+            ),
           );
         },
         routes: [

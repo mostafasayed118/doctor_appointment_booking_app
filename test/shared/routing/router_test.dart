@@ -125,6 +125,29 @@ void main() {
     expect(find.text('Doctors'), findsNothing);
   });
 
+  testWidgets('the appointments app bar sign-out action returns to /login', (
+    tester,
+  ) async {
+    // Same one-tap logout from the appointments screen.
+    final harness = buildTestApp(
+      repository: FakeAuthRepository(),
+      initialUser: user,
+      initialLocation: '/appointments',
+    );
+
+    await tester.pumpWidget(harness.app);
+    await settleTransition(tester);
+    expect(find.text('My appointments'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Sign out'));
+    await tester.pump();
+    harness.repository.emitAuthState(null);
+    await settleTransition(tester);
+
+    expect(find.text('Sign in'), findsWidgets);
+    expect(find.text('My appointments'), findsNothing);
+  });
+
   testWidgets('the doctors app bar sign-out action returns to /login', (
     tester,
   ) async {

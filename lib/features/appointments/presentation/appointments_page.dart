@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/entities/appointment.dart';
+import '../../../features/auth/presentation/auth_cubit.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/components/app_error_view.dart';
 import '../../../shared/components/constrained_content.dart';
@@ -27,7 +28,17 @@ class AppointmentsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.appointmentsTitle),
-        actions: const [LanguageToggleButton()],
+        actions: [
+          // One-tap logout from anywhere — the auth guard redirects to
+          // /login on the state change (authCubit is GoRouter's
+          // refreshListenable), mirroring the doctors app bar.
+          IconButton(
+            icon: const Icon(Icons.logout_outlined),
+            tooltip: l10n.signOut,
+            onPressed: () => context.read<AuthCubit>().signOut(),
+          ),
+          const LanguageToggleButton(),
+        ],
       ),
       body: BlocBuilder<AppointmentsCubit, AppointmentsState>(
         builder: (context, state) {
