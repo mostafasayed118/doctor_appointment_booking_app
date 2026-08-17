@@ -6,12 +6,14 @@ import 'package:doctor_appointment_booking_app/features/auth/domain/use_cases/si
 import 'package:doctor_appointment_booking_app/features/auth/domain/use_cases/sign_out.dart';
 import 'package:doctor_appointment_booking_app/features/auth/domain/use_cases/sign_up.dart';
 import 'package:doctor_appointment_booking_app/features/auth/presentation/auth_cubit.dart';
+import 'package:doctor_appointment_booking_app/features/booking/domain/booking_repository.dart';
 import 'package:doctor_appointment_booking_app/features/booking/domain/slots_repository.dart';
 import 'package:doctor_appointment_booking_app/features/doctors/domain/doctors_repository.dart';
 import 'package:doctor_appointment_booking_app/shared/routing/router.dart';
 import 'package:doctor_appointment_booking_app/core/entities/time_slot.dart';
 
 import 'fake_auth_repository.dart';
+import 'fake_booking_repository.dart';
 import 'fake_doctors_repository.dart';
 import 'fake_slots_repository.dart';
 
@@ -30,7 +32,7 @@ import 'fake_slots_repository.dart';
 /// locator registration with [doctors]' fake. Router tests can then
 /// navigate to /doctors with the real cubit chain over fake data.
 ({DoctorAppointmentApp app, AuthCubit cubit, FakeAuthRepository repository})
-    buildTestApp({
+buildTestApp({
   required FakeAuthRepository repository,
   AuthUser? initialUser,
   String initialLocation = '/',
@@ -46,6 +48,7 @@ import 'fake_slots_repository.dart';
   sl.registerSingleton<SlotsRepository>(
     FakeSlotsRepository(slotsByDoctor: slotsByDoctor),
   );
+  sl.registerSingleton<BookingRepository>(FakeBookingRepository());
 
   final cubit = AuthCubit(
     signIn: SignIn(repository),

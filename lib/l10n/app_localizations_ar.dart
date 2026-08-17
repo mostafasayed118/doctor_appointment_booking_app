@@ -104,4 +104,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get noSlotsThisDaySubtitle =>
       'جميع المواعيد في هذا اليوم محجوزة أو انتهت. جرّب يومًا آخر.';
+
+  @override
+  String get confirmBooking => 'تأكيد الحجز';
+
+  @override
+  String get bookingConfirmedTitle => 'تم حجز الموعد!';
+
+  @override
+  String get backToDoctors => 'العودة إلى الأطباء';
 }

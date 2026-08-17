@@ -8,10 +8,15 @@ import '../features/auth/domain/use_cases/sign_in.dart';
 import '../features/auth/domain/use_cases/sign_out.dart';
 import '../features/auth/domain/use_cases/sign_up.dart';
 import '../features/auth/presentation/auth_cubit.dart';
+import '../features/booking/data/firestore_booking_data_source.dart';
+import '../features/booking/data/booking_repository_impl.dart';
 import '../features/booking/data/firestore_slots_data_source.dart';
 import '../features/booking/data/slots_repository_impl.dart';
+import '../features/booking/domain/booking_repository.dart';
 import '../features/booking/domain/slots_repository.dart';
+import '../features/booking/domain/use_cases/book_slot.dart';
 import '../features/booking/domain/use_cases/get_slots.dart';
+import '../features/booking/presentation/booking_cubit.dart';
 import '../features/booking/presentation/slot_selection_cubit.dart';
 import '../features/doctors/data/doctors_repository_impl.dart';
 import '../features/doctors/data/firestore_doctors_data_source.dart';
@@ -63,7 +68,9 @@ void setupLocator() {
   sl.registerLazySingleton<DoctorsRepository>(
     () => DoctorsRepositoryImpl(dataSource: sl<FirestoreDoctorsDataSource>()),
   );
-  sl.registerLazySingleton<GetDoctors>(() => GetDoctors(sl<DoctorsRepository>()));
+  sl.registerLazySingleton<GetDoctors>(
+    () => GetDoctors(sl<DoctorsRepository>()),
+  );
   sl.registerLazySingleton<GetDoctor>(() => GetDoctor(sl<DoctorsRepository>()));
 
   // Screen-scoped Cubits: a fresh instance per navigation (the router's
@@ -85,6 +92,17 @@ void setupLocator() {
   sl.registerLazySingleton<GetSlots>(() => GetSlots(sl<SlotsRepository>()));
   sl.registerFactory<SlotSelectionCubit>(
     () => SlotSelectionCubit(getSlots: sl<GetSlots>()),
+  );
+
+  sl.registerLazySingleton<FirestoreBookingDataSource>(
+    () => FirestoreBookingDataSource(),
+  );
+  sl.registerLazySingleton<BookingRepository>(
+    () => BookingRepositoryImpl(dataSource: sl<FirestoreBookingDataSource>()),
+  );
+  sl.registerLazySingleton<BookSlot>(() => BookSlot(sl<BookingRepository>()));
+  sl.registerFactory<BookingCubit>(
+    () => BookingCubit(bookSlot: sl<BookSlot>()),
   );
 
   // Router depends on the AuthCubit singleton: the cubit is both the

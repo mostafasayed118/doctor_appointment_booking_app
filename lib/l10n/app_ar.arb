@@ -61,5 +61,11 @@
 
   "noSlotsThisDay": "لا توجد مواعيد في هذا اليوم",
 
-  "noSlotsThisDaySubtitle": "جميع المواعيد في هذا اليوم محجوزة أو انتهت. جرّب يومًا آخر."
+  "noSlotsThisDaySubtitle": "جميع المواعيد في هذا اليوم محجوزة أو انتهت. جرّب يومًا آخر.",
+
+  "confirmBooking": "تأكيد الحجز",
+
+  "bookingConfirmedTitle": "تم حجز الموعد!",
+
+  "backToDoctors": "العودة إلى الأطباء"
 }

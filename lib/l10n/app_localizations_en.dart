@@ -105,4 +105,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get noSlotsThisDaySubtitle =>
       'Every slot for this day is booked or has passed. Try another day.';
+
+  @override
+  String get confirmBooking => 'Confirm booking';
+
+  @override
+  String get bookingConfirmedTitle => 'Appointment booked!';
+
+  @override
+  String get backToDoctors => 'Back to doctors';
 }

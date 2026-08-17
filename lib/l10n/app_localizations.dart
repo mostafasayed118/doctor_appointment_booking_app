@@ -283,6 +283,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Every slot for this day is booked or has passed. Try another day.'**
   String get noSlotsThisDaySubtitle;
+
+  /// Bottom button on the slot selection page that starts the booking transaction
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm booking'**
+  String get confirmBooking;
+
+  /// Success heading on the confirmation page after a slot is booked
+  ///
+  /// In en, this message translates to:
+  /// **'Appointment booked!'**
+  String get bookingConfirmedTitle;
+
+  /// Button on the confirmation page that returns to the doctors list
+  ///
+  /// In en, this message translates to:
+  /// **'Back to doctors'**
+  String get backToDoctors;
 }
 
 class _AppLocalizationsDelegate

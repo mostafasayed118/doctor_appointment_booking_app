@@ -5,8 +5,11 @@ import 'package:go_router/go_router.dart';
 import '../../dev/component_gallery.dart';
 import '../../di/locator.dart';
 import '../../features/auth/presentation/auth_cubit.dart';
+import '../../features/auth/presentation/auth_state.dart';
 import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/signup_page.dart';
+import '../../features/booking/presentation/booking_cubit.dart';
+import '../../features/booking/presentation/confirmation_page.dart';
 import '../../features/booking/presentation/slot_selection_cubit.dart';
 import '../../features/booking/presentation/slot_selection_page.dart';
 import '../../features/doctors/presentation/doctor_profile_cubit.dart';
@@ -14,6 +17,7 @@ import '../../features/doctors/presentation/doctor_profile_page.dart';
 import '../../features/doctors/presentation/doctors_list_cubit.dart';
 import '../../features/doctors/presentation/doctors_list_page.dart';
 import '../../core/entities/doctor.dart';
+import '../../core/entities/time_slot.dart';
 import '../../shared/components/empty_state.dart';
 import 'auth_guard.dart';
 
@@ -22,10 +26,7 @@ import 'auth_guard.dart';
 /// [authCubit] doubles as `refreshListenable`: every state change re-runs
 /// the redirect, so sign-in/sign-out navigate automatically — no manual
 /// `context.go` after auth actions.
-GoRouter buildAppRouter(
-  AuthCubit authCubit, {
-  String initialLocation = '/',
-}) {
+GoRouter buildAppRouter(AuthCubit authCubit, {String initialLocation = '/'}) {
   // Location a signed-out user was trying to reach before being sent to
   // /login; restored once they authenticate. Owned by the redirect closure
   // so it can't leak between routers.
@@ -59,17 +60,13 @@ GoRouter buildAppRouter(
       // locator singleton, which is what lets tests inject a fake cubit.
       GoRoute(
         path: '/login',
-        builder: (context, state) => BlocProvider.value(
-          value: authCubit,
-          child: const LoginPage(),
-        ),
+        builder: (context, state) =>
+            BlocProvider.value(value: authCubit, child: const LoginPage()),
       ),
       GoRoute(
         path: '/signup',
-        builder: (context, state) => BlocProvider.value(
-          value: authCubit,
-          child: const SignupPage(),
-        ),
+        builder: (context, state) =>
+            BlocProvider.value(value: authCubit, child: const SignupPage()),
       ),
       GoRoute(
         path: '/home',
@@ -90,16 +87,17 @@ GoRouter buildAppRouter(
           GoRoute(
             path: ':id',
             builder: (context, state) => BlocProvider(
-              create: (_) => sl<DoctorProfileCubit>()
-                ..load(state.pathParameters['id']!),
+              create: (_) =>
+                  sl<DoctorProfileCubit>()..load(state.pathParameters['id']!),
               child: const DoctorProfilePage(),
             ),
             routes: [
               GoRoute(
                 path: 'book',
                 builder: (context, state) => BlocProvider(
-                  create: (_) => sl<SlotSelectionCubit>()
-                    ..load(state.pathParameters['id']!),
+                  create: (_) =>
+                      sl<SlotSelectionCubit>()
+                        ..load(state.pathParameters['id']!),
                   // The profile page passes the Doctor via `extra` so the
                   // booking AppBar can name them; deep-link restores fall
                   // back to the generic localized title.
@@ -107,6 +105,34 @@ GoRouter buildAppRouter(
                     doctorName: (state.extra as Doctor?)?.name,
                   ),
                 ),
+                routes: [
+                  GoRoute(
+                    path: 'confirm',
+                    // A deep-link straight to /confirm carries no selected
+                    // slot (extra is null) — a confirmation without a slot
+                    // is meaningless, so bounce back to slot selection.
+                    redirect: (context, state) =>
+                        state.extra is TimeSlot ? null : '../book',
+                    builder: (context, state) {
+                      // The auth guard guarantees an authenticated user by
+                      // the time this builder runs; fail loudly rather than
+                      // booking for an empty uid if that invariant ever
+                      // breaks.
+                      final authState = authCubit.state;
+                      if (authState is! Authenticated) {
+                        throw StateError(
+                          'Confirm route reached without an authenticated user.',
+                        );
+                      }
+                      final slot = state.extra! as TimeSlot;
+                      return BlocProvider(
+                        create: (_) => sl<BookingCubit>()
+                          ..confirm(patientId: authState.user.uid, slot: slot),
+                        child: const ConfirmationPage(),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

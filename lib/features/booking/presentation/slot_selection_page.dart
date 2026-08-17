@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/components/app_button.dart';
 import '../../../shared/components/app_error_view.dart';
 import '../../../shared/components/empty_state.dart';
 import '../../../shared/components/language_toggle_button.dart';
@@ -36,10 +38,12 @@ class SlotSelectionPage extends StatelessWidget {
         builder: (context, state) {
           final cubit = context.read<SlotSelectionCubit>();
           return switch (state) {
-            SlotSelectionInitial() || SlotSelectionLoading() =>
-              const LoadingView(),
-            SlotSelectionError(:final error) =>
-              AppErrorView(error: error, onRetry: cubit.retry),
+            SlotSelectionInitial() ||
+            SlotSelectionLoading() => const LoadingView(),
+            SlotSelectionError(:final error) => AppErrorView(
+              error: error,
+              onRetry: cubit.retry,
+            ),
             SlotSelectionLoaded() => _buildContent(context, l10n, state),
           };
         },
@@ -73,8 +77,7 @@ class SlotSelectionPage extends StatelessWidget {
           child: selectedDay.hasSlots
               ? GridView.builder(
                   padding: const EdgeInsets.all(16),
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
@@ -94,6 +97,23 @@ class SlotSelectionPage extends StatelessWidget {
                   icon: Icons.event_busy,
                   title: l10n.noSlotsThisDay,
                   subtitle: l10n.noSlotsThisDaySubtitle,
+                ),
+        ),
+        // Confirm is only possible once a tile is selected; the slot rides
+        // along as router `extra` so the confirmation route doesn't need a
+        // second fetch (deep-link restores of /confirm have no extra and
+        // bounce back here).
+        SafeArea(
+          minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: state.selectedSlot == null
+              ? const SizedBox.shrink()
+              : AppButton(
+                  label: l10n.confirmBooking,
+                  icon: Icons.check,
+                  onPressed: () => context.push(
+                    '/doctors/${state.doctorId}/book/confirm',
+                    extra: state.selectedSlot,
+                  ),
                 ),
         ),
       ],

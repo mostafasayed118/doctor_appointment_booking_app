@@ -160,5 +160,20 @@
   "noSlotsThisDaySubtitle": "Every slot for this day is booked or has passed. Try another day.",
   "@noSlotsThisDaySubtitle": {
     "description": "Empty state body when the selected day has no bookable slots left"
+  },
+
+  "confirmBooking": "Confirm booking",
+  "@confirmBooking": {
+    "description": "Bottom button on the slot selection page that starts the booking transaction"
+  },
+
+  "bookingConfirmedTitle": "Appointment booked!",
+  "@bookingConfirmedTitle": {
+    "description": "Success heading on the confirmation page after a slot is booked"
+  },
+
+  "backToDoctors": "Back to doctors",
+  "@backToDoctors": {
+    "description": "Button on the confirmation page that returns to the doctors list"
   }
 }
