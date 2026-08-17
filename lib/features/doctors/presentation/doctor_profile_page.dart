@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/entities/doctor.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/components/app_button.dart';
 import '../../../shared/components/app_error_view.dart';
 import '../../../shared/components/language_toggle_button.dart';
 import '../../../shared/components/loading_view.dart';
@@ -36,6 +38,7 @@ class DoctorProfilePage extends StatelessWidget {
                 doctor: doctor,
                 bioTitle: l10n.profileBio,
                 clinicTitle: l10n.profileClinic,
+                bookLabel: l10n.bookAppointment,
               ),
           };
         },
@@ -49,11 +52,13 @@ class _ProfileBody extends StatelessWidget {
     required this.doctor,
     required this.bioTitle,
     required this.clinicTitle,
+    required this.bookLabel,
   });
 
   final Doctor doctor;
   final String bioTitle;
   final String clinicTitle;
+  final String bookLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +113,16 @@ class _ProfileBody extends StatelessWidget {
               Expanded(child: Text(doctor.clinicAddress)),
             ],
           ),
+        ),
+        const SizedBox(height: 24),
+        // Booking entry: pass the Doctor via `extra` so the booking screen
+        // can show the name without a second fetch; the id travels in the
+        // path so deep-link restores still work.
+        AppButton(
+          label: bookLabel,
+          icon: Icons.calendar_month_outlined,
+          onPressed: () => context.push('/doctors/${doctor.id}/book',
+              extra: doctor),
         ),
       ],
     );

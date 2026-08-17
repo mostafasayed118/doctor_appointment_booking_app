@@ -135,5 +135,30 @@
   "browseDoctors": "Browse doctors",
   "@browseDoctors": {
     "description": "Gallery entry button that opens the doctors list"
+  },
+
+  "bookAppointment": "Book appointment",
+  "@bookAppointment": {
+    "description": "Button on the doctor profile that opens slot selection, and the AppBar title of the slot selection page"
+  },
+
+  "noSlotsAvailable": "No available slots",
+  "@noSlotsAvailable": {
+    "description": "Empty state when a doctor has no slot documents at all"
+  },
+
+  "noSlotsAvailableSubtitle": "This doctor has no appointment slots yet.",
+  "@noSlotsAvailableSubtitle": {
+    "description": "Empty state body when a doctor has no slot documents at all"
+  },
+
+  "noSlotsThisDay": "No slots this day",
+  "@noSlotsThisDay": {
+    "description": "Empty state when the selected day has no bookable slots left"
+  },
+
+  "noSlotsThisDaySubtitle": "Every slot for this day is booked or has passed. Try another day.",
+  "@noSlotsThisDaySubtitle": {
+    "description": "Empty state body when the selected day has no bookable slots left"
   }
 }

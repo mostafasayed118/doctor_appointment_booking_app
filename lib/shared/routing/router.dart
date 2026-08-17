@@ -7,10 +7,13 @@ import '../../di/locator.dart';
 import '../../features/auth/presentation/auth_cubit.dart';
 import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/signup_page.dart';
+import '../../features/booking/presentation/slot_selection_cubit.dart';
+import '../../features/booking/presentation/slot_selection_page.dart';
 import '../../features/doctors/presentation/doctor_profile_cubit.dart';
 import '../../features/doctors/presentation/doctor_profile_page.dart';
 import '../../features/doctors/presentation/doctors_list_cubit.dart';
 import '../../features/doctors/presentation/doctors_list_page.dart';
+import '../../core/entities/doctor.dart';
 import '../../shared/components/empty_state.dart';
 import 'auth_guard.dart';
 
@@ -91,6 +94,21 @@ GoRouter buildAppRouter(
                 ..load(state.pathParameters['id']!),
               child: const DoctorProfilePage(),
             ),
+            routes: [
+              GoRoute(
+                path: 'book',
+                builder: (context, state) => BlocProvider(
+                  create: (_) => sl<SlotSelectionCubit>()
+                    ..load(state.pathParameters['id']!),
+                  // The profile page passes the Doctor via `extra` so the
+                  // booking AppBar can name them; deep-link restores fall
+                  // back to the generic localized title.
+                  child: SlotSelectionPage(
+                    doctorName: (state.extra as Doctor?)?.name,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

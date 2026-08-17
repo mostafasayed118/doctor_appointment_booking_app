@@ -51,5 +51,15 @@
 
   "profileClinic": "العيادة",
 
-  "browseDoctors": "تصفح الأطباء"
+  "browseDoctors": "تصفح الأطباء",
+
+  "bookAppointment": "حجز موعد",
+
+  "noSlotsAvailable": "لا توجد مواعيد متاحة",
+
+  "noSlotsAvailableSubtitle": "لا توجد مواعيد متاحة لهذا الطبيب بعد.",
+
+  "noSlotsThisDay": "لا توجد مواعيد في هذا اليوم",
+
+  "noSlotsThisDaySubtitle": "جميع المواعيد في هذا اليوم محجوزة أو انتهت. جرّب يومًا آخر."
 }

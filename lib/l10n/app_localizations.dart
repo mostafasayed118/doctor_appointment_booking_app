@@ -253,6 +253,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Browse doctors'**
   String get browseDoctors;
+
+  /// Button on the doctor profile that opens slot selection, and the AppBar title of the slot selection page
+  ///
+  /// In en, this message translates to:
+  /// **'Book appointment'**
+  String get bookAppointment;
+
+  /// Empty state when a doctor has no slot documents at all
+  ///
+  /// In en, this message translates to:
+  /// **'No available slots'**
+  String get noSlotsAvailable;
+
+  /// Empty state body when a doctor has no slot documents at all
+  ///
+  /// In en, this message translates to:
+  /// **'This doctor has no appointment slots yet.'**
+  String get noSlotsAvailableSubtitle;
+
+  /// Empty state when the selected day has no bookable slots left
+  ///
+  /// In en, this message translates to:
+  /// **'No slots this day'**
+  String get noSlotsThisDay;
+
+  /// Empty state body when the selected day has no bookable slots left
+  ///
+  /// In en, this message translates to:
+  /// **'Every slot for this day is booked or has passed. Try another day.'**
+  String get noSlotsThisDaySubtitle;
 }
 
 class _AppLocalizationsDelegate

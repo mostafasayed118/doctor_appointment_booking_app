@@ -87,4 +87,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get browseDoctors => 'تصفح الأطباء';
+
+  @override
+  String get bookAppointment => 'حجز موعد';
+
+  @override
+  String get noSlotsAvailable => 'لا توجد مواعيد متاحة';
+
+  @override
+  String get noSlotsAvailableSubtitle =>
+      'لا توجد مواعيد متاحة لهذا الطبيب بعد.';
+
+  @override
+  String get noSlotsThisDay => 'لا توجد مواعيد في هذا اليوم';
+
+  @override
+  String get noSlotsThisDaySubtitle =>
+      'جميع المواعيد في هذا اليوم محجوزة أو انتهت. جرّب يومًا آخر.';
 }

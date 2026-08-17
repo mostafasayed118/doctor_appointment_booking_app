@@ -88,4 +88,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get browseDoctors => 'Browse doctors';
+
+  @override
+  String get bookAppointment => 'Book appointment';
+
+  @override
+  String get noSlotsAvailable => 'No available slots';
+
+  @override
+  String get noSlotsAvailableSubtitle =>
+      'This doctor has no appointment slots yet.';
+
+  @override
+  String get noSlotsThisDay => 'No slots this day';
+
+  @override
+  String get noSlotsThisDaySubtitle =>
+      'Every slot for this day is booked or has passed. Try another day.';
 }
