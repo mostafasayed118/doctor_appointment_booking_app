@@ -175,5 +175,85 @@
   "backToDoctors": "Back to doctors",
   "@backToDoctors": {
     "description": "Button on the confirmation page that returns to the doctors list"
+  },
+
+  "appointmentsTitle": "My appointments",
+  "@appointmentsTitle": {
+    "description": "App bar title of the appointments list and tooltip of the calendar entry point on the doctors list"
+  },
+
+  "upcomingTab": "Upcoming",
+  "@upcomingTab": {
+    "description": "Tab of appointments that are still scheduled and have not started"
+  },
+
+  "pastTab": "Past",
+  "@pastTab": {
+    "description": "Tab of cancelled, completed, or already-started appointments"
+  },
+
+  "cancelAppointment": "Cancel",
+  "@cancelAppointment": {
+    "description": "Button on an upcoming appointment that starts the cancel flow"
+  },
+
+  "cancelAppointmentTitle": "Cancel this appointment?",
+  "@cancelAppointmentTitle": {
+    "description": "Title of the cancel confirmation dialog"
+  },
+
+  "cancelAppointmentBody": "This frees the slot so another patient can book it.",
+  "@cancelAppointmentBody": {
+    "description": "Body of the cancel confirmation dialog"
+  },
+
+  "cancelConfirm": "Yes, cancel",
+  "@cancelConfirm": {
+    "description": "Confirm button of the cancel confirmation dialog"
+  },
+
+  "cancelDismiss": "Keep it",
+  "@cancelDismiss": {
+    "description": "Dismiss button of the cancel confirmation dialog"
+  },
+
+  "statusScheduled": "Scheduled",
+  "@statusScheduled": {
+    "description": "Badge label for an appointment that is booked and not yet started"
+  },
+
+  "statusCancelled": "Cancelled",
+  "@statusCancelled": {
+    "description": "Badge label for a cancelled appointment"
+  },
+
+  "statusCompleted": "Completed",
+  "@statusCompleted": {
+    "description": "Badge label for a completed appointment"
+  },
+
+  "noUpcomingAppointments": "No upcoming appointments",
+  "@noUpcomingAppointments": {
+    "description": "Empty state when the Upcoming tab has no appointments"
+  },
+
+  "noUpcomingAppointmentsSubtitle": "Book a slot with a doctor to see it here.",
+  "@noUpcomingAppointmentsSubtitle": {
+    "description": "Empty state body when the Upcoming tab has no appointments"
+  },
+
+  "noPastAppointments": "No past appointments",
+  "@noPastAppointments": {
+    "description": "Empty state when the Past tab has no appointments"
+  },
+
+  "noPastAppointmentsSubtitle": "Cancelled and completed appointments will appear here.",
+  "@noPastAppointmentsSubtitle": {
+    "description": "Empty state body when the Past tab has no appointments"
+  },
+
+  "unknownDoctor": "Unknown doctor",
+  "@unknownDoctor": {
+    "description": "Placeholder name on an appointment card whose doctor document is missing from the lookup"
   }
 }

@@ -114,4 +114,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backToDoctors => 'Back to doctors';
+
+  @override
+  String get appointmentsTitle => 'My appointments';
+
+  @override
+  String get upcomingTab => 'Upcoming';
+
+  @override
+  String get pastTab => 'Past';
+
+  @override
+  String get cancelAppointment => 'Cancel';
+
+  @override
+  String get cancelAppointmentTitle => 'Cancel this appointment?';
+
+  @override
+  String get cancelAppointmentBody =>
+      'This frees the slot so another patient can book it.';
+
+  @override
+  String get cancelConfirm => 'Yes, cancel';
+
+  @override
+  String get cancelDismiss => 'Keep it';
+
+  @override
+  String get statusScheduled => 'Scheduled';
+
+  @override
+  String get statusCancelled => 'Cancelled';
+
+  @override
+  String get statusCompleted => 'Completed';
+
+  @override
+  String get noUpcomingAppointments => 'No upcoming appointments';
+
+  @override
+  String get noUpcomingAppointmentsSubtitle =>
+      'Book a slot with a doctor to see it here.';
+
+  @override
+  String get noPastAppointments => 'No past appointments';
+
+  @override
+  String get noPastAppointmentsSubtitle =>
+      'Cancelled and completed appointments will appear here.';
+
+  @override
+  String get unknownDoctor => 'Unknown doctor';
 }

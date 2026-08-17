@@ -113,4 +113,54 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get backToDoctors => 'العودة إلى الأطباء';
+
+  @override
+  String get appointmentsTitle => 'مواعيدي';
+
+  @override
+  String get upcomingTab => 'القادمة';
+
+  @override
+  String get pastTab => 'السابقة';
+
+  @override
+  String get cancelAppointment => 'إلغاء';
+
+  @override
+  String get cancelAppointmentTitle => 'إلغاء هذا الموعد؟';
+
+  @override
+  String get cancelAppointmentBody =>
+      'سيؤدي هذا إلى تحرير الموعد ليمكن حجزه من مريض آخر.';
+
+  @override
+  String get cancelConfirm => 'نعم، إلغاء';
+
+  @override
+  String get cancelDismiss => 'إبقاء الموعد';
+
+  @override
+  String get statusScheduled => 'مجدول';
+
+  @override
+  String get statusCancelled => 'ملغى';
+
+  @override
+  String get statusCompleted => 'مكتمل';
+
+  @override
+  String get noUpcomingAppointments => 'لا توجد مواعيد قادمة';
+
+  @override
+  String get noUpcomingAppointmentsSubtitle => 'احجز موعدًا مع طبيب ليراه هنا.';
+
+  @override
+  String get noPastAppointments => 'لا توجد مواعيد سابقة';
+
+  @override
+  String get noPastAppointmentsSubtitle =>
+      'ستظهر المواعيد الملغاة والمكتملة هنا.';
+
+  @override
+  String get unknownDoctor => 'طبيب غير معروف';
 }

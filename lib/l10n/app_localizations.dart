@@ -301,6 +301,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to doctors'**
   String get backToDoctors;
+
+  /// App bar title of the appointments list and tooltip of the calendar entry point on the doctors list
+  ///
+  /// In en, this message translates to:
+  /// **'My appointments'**
+  String get appointmentsTitle;
+
+  /// Tab of appointments that are still scheduled and have not started
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcomingTab;
+
+  /// Tab of cancelled, completed, or already-started appointments
+  ///
+  /// In en, this message translates to:
+  /// **'Past'**
+  String get pastTab;
+
+  /// Button on an upcoming appointment that starts the cancel flow
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelAppointment;
+
+  /// Title of the cancel confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this appointment?'**
+  String get cancelAppointmentTitle;
+
+  /// Body of the cancel confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'This frees the slot so another patient can book it.'**
+  String get cancelAppointmentBody;
+
+  /// Confirm button of the cancel confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, cancel'**
+  String get cancelConfirm;
+
+  /// Dismiss button of the cancel confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Keep it'**
+  String get cancelDismiss;
+
+  /// Badge label for an appointment that is booked and not yet started
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get statusScheduled;
+
+  /// Badge label for a cancelled appointment
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get statusCancelled;
+
+  /// Badge label for a completed appointment
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get statusCompleted;
+
+  /// Empty state when the Upcoming tab has no appointments
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming appointments'**
+  String get noUpcomingAppointments;
+
+  /// Empty state body when the Upcoming tab has no appointments
+  ///
+  /// In en, this message translates to:
+  /// **'Book a slot with a doctor to see it here.'**
+  String get noUpcomingAppointmentsSubtitle;
+
+  /// Empty state when the Past tab has no appointments
+  ///
+  /// In en, this message translates to:
+  /// **'No past appointments'**
+  String get noPastAppointments;
+
+  /// Empty state body when the Past tab has no appointments
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled and completed appointments will appear here.'**
+  String get noPastAppointmentsSubtitle;
+
+  /// Placeholder name on an appointment card whose doctor document is missing from the lookup
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown doctor'**
+  String get unknownDoctor;
 }
 
 class _AppLocalizationsDelegate

@@ -67,5 +67,37 @@
 
   "bookingConfirmedTitle": "تم حجز الموعد!",
 
-  "backToDoctors": "العودة إلى الأطباء"
+  "backToDoctors": "العودة إلى الأطباء",
+
+  "appointmentsTitle": "مواعيدي",
+
+  "upcomingTab": "القادمة",
+
+  "pastTab": "السابقة",
+
+  "cancelAppointment": "إلغاء",
+
+  "cancelAppointmentTitle": "إلغاء هذا الموعد؟",
+
+  "cancelAppointmentBody": "سيؤدي هذا إلى تحرير الموعد ليمكن حجزه من مريض آخر.",
+
+  "cancelConfirm": "نعم، إلغاء",
+
+  "cancelDismiss": "إبقاء الموعد",
+
+  "statusScheduled": "مجدول",
+
+  "statusCancelled": "ملغى",
+
+  "statusCompleted": "مكتمل",
+
+  "noUpcomingAppointments": "لا توجد مواعيد قادمة",
+
+  "noUpcomingAppointmentsSubtitle": "احجز موعدًا مع طبيب ليراه هنا.",
+
+  "noPastAppointments": "لا توجد مواعيد سابقة",
+
+  "noPastAppointmentsSubtitle": "ستظهر المواعيد الملغاة والمكتملة هنا.",
+
+  "unknownDoctor": "طبيب غير معروف"
 }

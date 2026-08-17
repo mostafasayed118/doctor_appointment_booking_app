@@ -5,13 +5,16 @@ import 'package:doctor_appointment_booking_app/features/auth/domain/auth_user.da
 import 'package:doctor_appointment_booking_app/features/auth/domain/use_cases/sign_in.dart';
 import 'package:doctor_appointment_booking_app/features/auth/domain/use_cases/sign_out.dart';
 import 'package:doctor_appointment_booking_app/features/auth/domain/use_cases/sign_up.dart';
+import 'package:doctor_appointment_booking_app/features/appointments/domain/appointments_repository.dart';
 import 'package:doctor_appointment_booking_app/features/auth/presentation/auth_cubit.dart';
 import 'package:doctor_appointment_booking_app/features/booking/domain/booking_repository.dart';
 import 'package:doctor_appointment_booking_app/features/booking/domain/slots_repository.dart';
 import 'package:doctor_appointment_booking_app/features/doctors/domain/doctors_repository.dart';
 import 'package:doctor_appointment_booking_app/shared/routing/router.dart';
 import 'package:doctor_appointment_booking_app/core/entities/time_slot.dart';
+import 'package:doctor_appointment_booking_app/core/entities/appointment.dart';
 
+import 'fake_appointments_repository.dart';
 import 'fake_auth_repository.dart';
 import 'fake_booking_repository.dart';
 import 'fake_doctors_repository.dart';
@@ -38,6 +41,7 @@ buildTestApp({
   String initialLocation = '/',
   List<Doctor> doctors = const [],
   Map<String, List<TimeSlot>> slotsByDoctor = const {},
+  List<Appointment> appointments = const [],
 }) {
   // GetIt 9: overriding an existing registration is gated by an instance
   // flag rather than a per-call parameter (allowReassignment: true).
@@ -49,6 +53,9 @@ buildTestApp({
     FakeSlotsRepository(slotsByDoctor: slotsByDoctor),
   );
   sl.registerSingleton<BookingRepository>(FakeBookingRepository());
+  sl.registerSingleton<AppointmentsRepository>(
+    FakeAppointmentsRepository(appointments: appointments),
+  );
 
   final cubit = AuthCubit(
     signIn: SignIn(repository),

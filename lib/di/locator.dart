@@ -8,6 +8,12 @@ import '../features/auth/domain/use_cases/sign_in.dart';
 import '../features/auth/domain/use_cases/sign_out.dart';
 import '../features/auth/domain/use_cases/sign_up.dart';
 import '../features/auth/presentation/auth_cubit.dart';
+import '../features/appointments/data/appointments_repository_impl.dart';
+import '../features/appointments/data/firestore_appointments_data_source.dart';
+import '../features/appointments/domain/appointments_repository.dart';
+import '../features/appointments/domain/use_cases/cancel_appointment.dart';
+import '../features/appointments/domain/use_cases/get_appointments.dart';
+import '../features/appointments/presentation/appointments_cubit.dart';
 import '../features/booking/data/firestore_booking_data_source.dart';
 import '../features/booking/data/booking_repository_impl.dart';
 import '../features/booking/data/firestore_slots_data_source.dart';
@@ -103,6 +109,28 @@ void setupLocator() {
   sl.registerLazySingleton<BookSlot>(() => BookSlot(sl<BookingRepository>()));
   sl.registerFactory<BookingCubit>(
     () => BookingCubit(bookSlot: sl<BookSlot>()),
+  );
+
+  sl.registerLazySingleton<FirestoreAppointmentsDataSource>(
+    () => FirestoreAppointmentsDataSource(),
+  );
+  sl.registerLazySingleton<AppointmentsRepository>(
+    () => AppointmentsRepositoryImpl(
+      dataSource: sl<FirestoreAppointmentsDataSource>(),
+    ),
+  );
+  sl.registerLazySingleton<GetAppointments>(
+    () => GetAppointments(sl<AppointmentsRepository>()),
+  );
+  sl.registerLazySingleton<CancelAppointment>(
+    () => CancelAppointment(sl<AppointmentsRepository>()),
+  );
+  sl.registerFactory<AppointmentsCubit>(
+    () => AppointmentsCubit(
+      getAppointments: sl<GetAppointments>(),
+      cancelAppointment: sl<CancelAppointment>(),
+      getDoctors: sl<GetDoctors>(),
+    ),
   );
 
   // Router depends on the AuthCubit singleton: the cubit is both the

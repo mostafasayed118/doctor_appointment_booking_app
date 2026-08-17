@@ -8,6 +8,8 @@ import '../../features/auth/presentation/auth_cubit.dart';
 import '../../features/auth/presentation/auth_state.dart';
 import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/signup_page.dart';
+import '../../features/appointments/presentation/appointments_cubit.dart';
+import '../../features/appointments/presentation/appointments_page.dart';
 import '../../features/booking/presentation/booking_cubit.dart';
 import '../../features/booking/presentation/confirmation_page.dart';
 import '../../features/booking/presentation/slot_selection_cubit.dart';
@@ -77,6 +79,24 @@ GoRouter buildAppRouter(AuthCubit authCubit, {String initialLocation = '/'}) {
       ),
       // Screen-scoped cubits: created fresh per navigation via the locator
       // factory and closed by BlocProvider when the route is disposed.
+      GoRoute(
+        path: '/appointments',
+        builder: (context, state) {
+          // The auth guard guarantees an authenticated user by the time
+          // this builder runs; fail loudly rather than querying with an
+          // empty uid if that invariant ever breaks (same as /confirm).
+          final authState = authCubit.state;
+          if (authState is! Authenticated) {
+            throw StateError(
+              'Appointments route reached without an authenticated user.',
+            );
+          }
+          return BlocProvider(
+            create: (_) => sl<AppointmentsCubit>()..load(authState.user.uid),
+            child: const AppointmentsPage(),
+          );
+        },
+      ),
       GoRoute(
         path: '/doctors',
         builder: (context, state) => BlocProvider(

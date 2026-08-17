@@ -42,6 +42,12 @@ class _DoctorsListPageState extends State<DoctorsListPage> {
       appBar: AppBar(
         title: Text(l10n.doctorsTitle),
         actions: [
+          // Entry point to the patient's own appointments.
+          IconButton(
+            icon: const Icon(Icons.calendar_month_outlined),
+            tooltip: l10n.appointmentsTitle,
+            onPressed: () => context.push('/appointments'),
+          ),
           const LanguageToggleButton(),
           // Dev-only: the component gallery is no longer the landing, so
           // keep it one tap away (theme/locale toggles, sign-out).

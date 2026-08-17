@@ -66,6 +66,21 @@ final class SlotUnavailableError extends AppError {
         );
 }
 
+/// The appointment was already cancelled, so the cancel request is a no-op
+/// that would double-free the slot.
+///
+/// Like [SlotUnavailableError], this is our own business rule raised
+/// deliberately inside the cancel transaction (the appointment read shows
+/// `status: cancelled`), not a Firebase signal — the appointments
+/// repository catches it before the SDK error mapper.
+final class AppointmentAlreadyCancelledError extends AppError {
+  const AppointmentAlreadyCancelledError({String? message})
+      : super(
+          code: 'appointment_already_cancelled',
+          message: message ?? 'This appointment has already been cancelled.',
+        );
+}
+
 /// A requested document (doctor, slot, appointment) does not exist.
 final class NotFoundError extends AppError {
   const NotFoundError({String? message})
