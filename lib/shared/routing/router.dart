@@ -101,11 +101,18 @@ GoRouter buildAppRouter(AuthCubit authCubit, {String initialLocation = '/'}) {
           // Reschedule (Task 14): slot selection in reschedule mode. The
           // appointment rides as `extra` so the cubit knows which doctor to
           // load and which slot to exclude; deep-link restores have no
-          // extra and bounce back to the list.
+          // extra and bounce back to the list. The confirm sub-route's push
+          // also passes THROUGH this route with a (Appointment, TimeSlot)
+          // record extra, so both shapes must be accepted. Absolute redirect
+          // targets only: GoRouter 17 parses a relative string like '..' as
+          // the literal location '/..', which matches nothing.
           GoRoute(
             path: 'reschedule',
             redirect: (context, state) =>
-                state.extra is Appointment ? null : '..',
+                state.extra is Appointment ||
+                    state.extra is (Appointment, TimeSlot)
+                ? null
+                : '/appointments',
             builder: (context, state) {
               final appointment = state.extra! as Appointment;
               return BlocProvider(
@@ -122,9 +129,12 @@ GoRouter buildAppRouter(AuthCubit authCubit, {String initialLocation = '/'}) {
                 path: 'confirm',
                 // The extra is a (Appointment, TimeSlot) record — rescheduling
                 // without both is meaningless, so bounce back to slot
-                // selection.
+                // selection (absolute target: relative '..' would become the
+                // unmatchable location '/..' in GoRouter 17).
                 redirect: (context, state) =>
-                    state.extra is (Appointment, TimeSlot) ? null : '..',
+                    state.extra is (Appointment, TimeSlot)
+                    ? null
+                    : '/appointments',
                 builder: (context, state) {
                   // Same invariant as the book confirm route: the guard
                   // guarantees an authenticated user by now.
@@ -185,9 +195,12 @@ GoRouter buildAppRouter(AuthCubit authCubit, {String initialLocation = '/'}) {
                     path: 'confirm',
                     // A deep-link straight to /confirm carries no selected
                     // slot (extra is null) — a confirmation without a slot
-                    // is meaningless, so bounce back to slot selection.
-                    redirect: (context, state) =>
-                        state.extra is TimeSlot ? null : '../book',
+                    // is meaningless, so bounce back to slot selection
+                    // (absolute target: relative '../book' would become the
+                    // unmatchable location '/../book' in GoRouter 17).
+                    redirect: (context, state) => state.extra is TimeSlot
+                        ? null
+                        : '/doctors/${state.pathParameters['id']}/book',
                     builder: (context, state) {
                       // The auth guard guarantees an authenticated user by
                       // the time this builder runs; fail loudly rather than

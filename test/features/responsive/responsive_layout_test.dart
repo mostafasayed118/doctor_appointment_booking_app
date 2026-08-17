@@ -166,6 +166,45 @@ void main() {
         expect(find.text('My appointments'), findsOneWidget);
         expect(find.text('Ana Patel'), findsOneWidget);
       });
+
+      testWidgets('reschedule confirm flow reaches the confirmation page', (
+        tester,
+      ) async {
+        // Regression: Task 14's reschedule confirm push ended on the router's
+        // 'Route not found' error page in production — the reschedule route's
+        // redirect only accepts a bare Appointment extra, but the confirm push
+        // carries a (Appointment, TimeSlot) record. Drive the REAL router
+        // through the whole flow: appointments → reschedule → pick a slot →
+        // confirm — and assert we land on the reschedule confirmation.
+        await pumpRoute(
+          tester,
+          size,
+          location: '/appointments',
+          signedIn: true,
+          doctors: const [ana],
+          slotsByDoctor: {
+            'd1': [futureSlot('s2')],
+          },
+          appointments: [futureAppointment()],
+        );
+        expect(find.text('My appointments'), findsOneWidget);
+
+        await tester.tap(find.text('Reschedule'));
+        await settleTransition(tester);
+        expect(find.text('Reschedule appointment'), findsOneWidget);
+
+        await tester.tap(find.byType(SlotTile));
+        await tester.pump();
+        await tester.tap(find.text('Reschedule'));
+        await settleTransition(tester);
+
+        expect(
+          find.text('Route not found'),
+          findsNothing,
+          reason: 'the reschedule confirm push must resolve, not error',
+        );
+        expect(find.text('Appointment rescheduled!'), findsOneWidget);
+      });
     });
   }
 
