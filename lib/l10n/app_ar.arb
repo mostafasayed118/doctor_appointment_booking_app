@@ -107,5 +107,9 @@
 
   "rescheduleConfirmedTitle": "تمت إعادة جدولة الموعد!",
 
-  "backToAppointments": "العودة إلى المواعيد"
+  "backToAppointments": "العودة إلى المواعيد",
+
+  "firebaseUnavailableTitle": "Firebase غير مُهيّأ",
+
+  "firebaseUnavailableBody": "لا توجد إعدادات Firebase لهذا الجهاز (google-services.json أو GoogleService-Info.plist)، لذا لا يمكن للتطبيق الوصول إلى بياناته. أضف ملف الإعدادات وأعد التشغيل، أو استخدم نسخة الويب."
 }

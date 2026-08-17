@@ -175,4 +175,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get backToAppointments => 'العودة إلى المواعيد';
+
+  @override
+  String get firebaseUnavailableTitle => 'Firebase غير مُهيّأ';
+
+  @override
+  String get firebaseUnavailableBody =>
+      'لا توجد إعدادات Firebase لهذا الجهاز (google-services.json أو GoogleService-Info.plist)، لذا لا يمكن للتطبيق الوصول إلى بياناته. أضف ملف الإعدادات وأعد التشغيل، أو استخدم نسخة الويب.';
 }

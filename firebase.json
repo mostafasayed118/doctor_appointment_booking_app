@@ -8,14 +8,42 @@
   },
   "hosting": {
     "public": "public",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
     "headers": [
       {
         "source": "/doctor-photos/**",
         "headers": [
-          { "key": "Access-Control-Allow-Origin", "value": "*" }
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
         ]
       }
     ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "doctor-appointment-booki-fc9d6",
+          "appId": "1:936582001674:android:575202916d784775e45bf3",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "doctor-appointment-booki-fc9d6",
+          "configurations": {
+            "android": "1:936582001674:android:575202916d784775e45bf3",
+            "ios": "1:936582001674:ios:447228bf15c1a7a1e45bf3",
+            "web": "1:936582001674:web:3941db61545caed6e45bf3"
+          }
+        }
+      }
+    }
   }
 }

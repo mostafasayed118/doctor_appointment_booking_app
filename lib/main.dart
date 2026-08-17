@@ -4,6 +4,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'app.dart';
 import 'data/firebase/firebase_bootstrap.dart';
 import 'di/locator.dart';
+import 'shared/components/firebase_unavailable_app.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +14,13 @@ Future<void> main() async {
   // widget can resolve dependencies via `sl<T>()` during build.
   setupLocator();
   // Guarded: succeeds only when Firebase platform config is present
-  // (Option A — see FirebaseBootstrap).
+  // (Option A — see FirebaseBootstrap). When it isn't, the full app would
+  // crash on its first router build (AuthCubit touches FirebaseAuth.instance
+  // → [core/no-app]), so render the degraded explanation screen instead.
   await FirebaseBootstrap.init();
-  runApp(const DoctorAppointmentApp());
+  runApp(
+    FirebaseBootstrap.isReady
+        ? const DoctorAppointmentApp()
+        : const FirebaseUnavailableApp(),
+  );
 }

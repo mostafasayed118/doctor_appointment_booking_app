@@ -177,4 +177,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backToAppointments => 'Back to appointments';
+
+  @override
+  String get firebaseUnavailableTitle => 'Firebase is not configured';
+
+  @override
+  String get firebaseUnavailableBody =>
+      'This platform has no Firebase configuration (google-services.json / GoogleService-Info.plist), so the app can\'t reach its data. Add the config file and restart, or run the web build.';
 }

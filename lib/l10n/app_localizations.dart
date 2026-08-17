@@ -421,6 +421,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back to appointments'**
   String get backToAppointments;
+
+  /// Heading shown when Firebase couldn't initialize on this platform
+  ///
+  /// In en, this message translates to:
+  /// **'Firebase is not configured'**
+  String get firebaseUnavailableTitle;
+
+  /// Explanation shown when Firebase couldn't initialize on this platform
+  ///
+  /// In en, this message translates to:
+  /// **'This platform has no Firebase configuration (google-services.json / GoogleService-Info.plist), so the app can\'t reach its data. Add the config file and restart, or run the web build.'**
+  String get firebaseUnavailableBody;
 }
 
 class _AppLocalizationsDelegate

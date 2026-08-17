@@ -275,5 +275,15 @@
   "backToAppointments": "Back to appointments",
   "@backToAppointments": {
     "description": "Button on the reschedule confirmation page that returns to the appointments list"
+  },
+
+  "firebaseUnavailableTitle": "Firebase is not configured",
+  "@firebaseUnavailableTitle": {
+    "description": "Heading shown when Firebase couldn't initialize on this platform"
+  },
+
+  "firebaseUnavailableBody": "This platform has no Firebase configuration (google-services.json / GoogleService-Info.plist), so the app can't reach its data. Add the config file and restart, or run the web build.",
+  "@firebaseUnavailableBody": {
+    "description": "Explanation shown when Firebase couldn't initialize on this platform"
   }
 }
